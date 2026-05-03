@@ -1,0 +1,4 @@
+/home/leonuraht/storage/CFiles/VoxelE/build/CMakeFiles/glad.dir
+/home/leonuraht/storage/CFiles/VoxelE/build/CMakeFiles/VoxelE.dir
+/home/leonuraht/storage/CFiles/VoxelE/build/CMakeFiles/edit_cache.dir
+/home/leonuraht/storage/CFiles/VoxelE/build/CMakeFiles/rebuild_cache.dir
