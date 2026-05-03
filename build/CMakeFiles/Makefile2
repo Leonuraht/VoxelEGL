@@ -88,7 +88,7 @@ clean: CMakeFiles/VoxelE.dir/clean
 CMakeFiles/glad.dir/all:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/glad.dir/build.make CMakeFiles/glad.dir/depend
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/glad.dir/build.make CMakeFiles/glad.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/leonuraht/storage/CFiles/VoxelE/build/CMakeFiles --progress-num=3,4 "Built target glad"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/leonuraht/storage/CFiles/VoxelE/build/CMakeFiles --progress-num=4,5 "Built target glad"
 .PHONY : CMakeFiles/glad.dir/all
 
 # Build rule for subdir invocation for target.
@@ -105,7 +105,7 @@ glad: CMakeFiles/glad.dir/rule
 # codegen rule for target.
 CMakeFiles/glad.dir/codegen:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/glad.dir/build.make CMakeFiles/glad.dir/codegen
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/leonuraht/storage/CFiles/VoxelE/build/CMakeFiles --progress-num=3,4 "Finished codegen for target glad"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/leonuraht/storage/CFiles/VoxelE/build/CMakeFiles --progress-num=4,5 "Finished codegen for target glad"
 .PHONY : CMakeFiles/glad.dir/codegen
 
 # clean rule for target.
@@ -120,12 +120,12 @@ CMakeFiles/glad.dir/clean:
 CMakeFiles/VoxelE.dir/all: CMakeFiles/glad.dir/all
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/VoxelE.dir/build.make CMakeFiles/VoxelE.dir/depend
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/VoxelE.dir/build.make CMakeFiles/VoxelE.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/leonuraht/storage/CFiles/VoxelE/build/CMakeFiles --progress-num=1,2 "Built target VoxelE"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/leonuraht/storage/CFiles/VoxelE/build/CMakeFiles --progress-num=1,2,3 "Built target VoxelE"
 .PHONY : CMakeFiles/VoxelE.dir/all
 
 # Build rule for subdir invocation for target.
 CMakeFiles/VoxelE.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/leonuraht/storage/CFiles/VoxelE/build/CMakeFiles 4
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/leonuraht/storage/CFiles/VoxelE/build/CMakeFiles 5
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 CMakeFiles/VoxelE.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/leonuraht/storage/CFiles/VoxelE/build/CMakeFiles 0
 .PHONY : CMakeFiles/VoxelE.dir/rule
@@ -137,7 +137,7 @@ VoxelE: CMakeFiles/VoxelE.dir/rule
 # codegen rule for target.
 CMakeFiles/VoxelE.dir/codegen:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/VoxelE.dir/build.make CMakeFiles/VoxelE.dir/codegen
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/leonuraht/storage/CFiles/VoxelE/build/CMakeFiles --progress-num=1,2 "Finished codegen for target VoxelE"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/leonuraht/storage/CFiles/VoxelE/build/CMakeFiles --progress-num=1,2,3 "Finished codegen for target VoxelE"
 .PHONY : CMakeFiles/VoxelE.dir/codegen
 
 # clean rule for target.

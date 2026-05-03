@@ -10,5 +10,11 @@
   "command": "/usr/sbin/c++  -I/home/leonuraht/storage/CFiles/VoxelE/include -std=gnu++23 -Wall -Wextra -Wpedantic -o CMakeFiles/VoxelE.dir/src/main.cpp.o -c /home/leonuraht/storage/CFiles/VoxelE/src/main.cpp",
   "file": "/home/leonuraht/storage/CFiles/VoxelE/src/main.cpp",
   "output": "CMakeFiles/VoxelE.dir/src/main.cpp.o"
+},
+{
+  "directory": "/home/leonuraht/storage/CFiles/VoxelE/build",
+  "command": "/usr/sbin/c++  -I/home/leonuraht/storage/CFiles/VoxelE/include -std=gnu++23 -Wall -Wextra -Wpedantic -o CMakeFiles/VoxelE.dir/src/shader.cpp.o -c /home/leonuraht/storage/CFiles/VoxelE/src/shader.cpp",
+  "file": "/home/leonuraht/storage/CFiles/VoxelE/src/shader.cpp",
+  "output": "CMakeFiles/VoxelE.dir/src/shader.cpp.o"
 }
 ]

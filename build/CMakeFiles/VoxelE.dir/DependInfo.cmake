@@ -9,6 +9,7 @@ set(CMAKE_DEPENDS_LANGUAGES
 # The set of dependency files which are needed:
 set(CMAKE_DEPENDS_DEPENDENCY_FILES
   "/home/leonuraht/storage/CFiles/VoxelE/src/main.cpp" "CMakeFiles/VoxelE.dir/src/main.cpp.o" "gcc" "CMakeFiles/VoxelE.dir/src/main.cpp.o.d"
+  "/home/leonuraht/storage/CFiles/VoxelE/src/shader.cpp" "CMakeFiles/VoxelE.dir/src/shader.cpp.o" "gcc" "CMakeFiles/VoxelE.dir/src/shader.cpp.o.d"
   "" "VoxelE" "gcc" "CMakeFiles/VoxelE.dir/link.d"
   )
 
