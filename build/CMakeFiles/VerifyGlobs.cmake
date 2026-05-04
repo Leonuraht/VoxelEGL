@@ -30,6 +30,7 @@ endif()
 # SRC_FILES at CMakeLists.txt:16 (file)
 file(GLOB_RECURSE NEW_GLOB LIST_DIRECTORIES false "/home/leonuraht/storage/CFiles/VoxelE/src/*.cpp")
 set(OLD_GLOB
+  "/home/leonuraht/storage/CFiles/VoxelE/src/camera.cpp"
   "/home/leonuraht/storage/CFiles/VoxelE/src/main.cpp"
   "/home/leonuraht/storage/CFiles/VoxelE/src/shader.cpp"
   )

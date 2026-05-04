@@ -2,6 +2,7 @@ VoxelE: \
   /usr/lib/gcc/x86_64-pc-linux-gnu/15.2.1/../../../../lib/Scrt1.o \
   /usr/lib/gcc/x86_64-pc-linux-gnu/15.2.1/../../../../lib/crti.o \
   /usr/lib/gcc/x86_64-pc-linux-gnu/15.2.1/crtbeginS.o \
+  CMakeFiles/VoxelE.dir/src/camera.cpp.o \
   CMakeFiles/VoxelE.dir/src/main.cpp.o \
   CMakeFiles/VoxelE.dir/src/shader.cpp.o \
   libglad.a \
@@ -48,6 +49,8 @@ VoxelE: \
 /usr/lib/gcc/x86_64-pc-linux-gnu/15.2.1/../../../../lib/crti.o:
 
 /usr/lib/gcc/x86_64-pc-linux-gnu/15.2.1/crtbeginS.o:
+
+CMakeFiles/VoxelE.dir/src/camera.cpp.o:
 
 CMakeFiles/VoxelE.dir/src/main.cpp.o:
 

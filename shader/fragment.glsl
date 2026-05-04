@@ -1,8 +1,8 @@
 #version 460 core
 out vec4 fragcolor;
 
-in vec3 apos;
+in vec3 normal;
 
 void main(){
-    fragcolor = vec4(apos,1.0f);
+    fragcolor = vec4(abs(normal),1.0f);
 }
