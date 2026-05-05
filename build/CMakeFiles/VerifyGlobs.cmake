@@ -33,6 +33,7 @@ set(OLD_GLOB
   "/home/leonuraht/storage/CFiles/VoxelE/src/camera.cpp"
   "/home/leonuraht/storage/CFiles/VoxelE/src/main.cpp"
   "/home/leonuraht/storage/CFiles/VoxelE/src/shader.cpp"
+  "/home/leonuraht/storage/CFiles/VoxelE/src/terrain.cpp"
   )
 if(NOT "${NEW_GLOB}" STREQUAL "${OLD_GLOB}")
   message("-- GLOB mismatch!")

@@ -239,6 +239,30 @@ src/shader.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/VoxelE.dir/build.make CMakeFiles/VoxelE.dir/src/shader.cpp.s
 .PHONY : src/shader.cpp.s
 
+src/terrain.o: src/terrain.cpp.o
+.PHONY : src/terrain.o
+
+# target to build an object file
+src/terrain.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/VoxelE.dir/build.make CMakeFiles/VoxelE.dir/src/terrain.cpp.o
+.PHONY : src/terrain.cpp.o
+
+src/terrain.i: src/terrain.cpp.i
+.PHONY : src/terrain.i
+
+# target to preprocess a source file
+src/terrain.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/VoxelE.dir/build.make CMakeFiles/VoxelE.dir/src/terrain.cpp.i
+.PHONY : src/terrain.cpp.i
+
+src/terrain.s: src/terrain.cpp.s
+.PHONY : src/terrain.s
+
+# target to generate assembly for a file
+src/terrain.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/VoxelE.dir/build.make CMakeFiles/VoxelE.dir/src/terrain.cpp.s
+.PHONY : src/terrain.cpp.s
+
 # Help Target
 help:
 	@echo "The following are some of the valid targets for this Makefile:"
@@ -261,6 +285,9 @@ help:
 	@echo "... src/shader.o"
 	@echo "... src/shader.i"
 	@echo "... src/shader.s"
+	@echo "... src/terrain.o"
+	@echo "... src/terrain.i"
+	@echo "... src/terrain.s"
 .PHONY : help
 
 

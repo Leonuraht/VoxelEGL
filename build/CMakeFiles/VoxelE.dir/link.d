@@ -5,6 +5,7 @@ VoxelE: \
   CMakeFiles/VoxelE.dir/src/camera.cpp.o \
   CMakeFiles/VoxelE.dir/src/main.cpp.o \
   CMakeFiles/VoxelE.dir/src/shader.cpp.o \
+  CMakeFiles/VoxelE.dir/src/terrain.cpp.o \
   libglad.a \
   /usr/lib/libglfw.so.3.4 \
   /usr/lib/libglm.a \
@@ -55,6 +56,8 @@ CMakeFiles/VoxelE.dir/src/camera.cpp.o:
 CMakeFiles/VoxelE.dir/src/main.cpp.o:
 
 CMakeFiles/VoxelE.dir/src/shader.cpp.o:
+
+CMakeFiles/VoxelE.dir/src/terrain.cpp.o:
 
 libglad.a:
 

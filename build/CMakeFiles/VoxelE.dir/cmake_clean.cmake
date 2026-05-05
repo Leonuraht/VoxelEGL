@@ -6,6 +6,8 @@ file(REMOVE_RECURSE
   "CMakeFiles/VoxelE.dir/src/main.cpp.o.d"
   "CMakeFiles/VoxelE.dir/src/shader.cpp.o"
   "CMakeFiles/VoxelE.dir/src/shader.cpp.o.d"
+  "CMakeFiles/VoxelE.dir/src/terrain.cpp.o"
+  "CMakeFiles/VoxelE.dir/src/terrain.cpp.o.d"
   "VoxelE"
   "VoxelE.pdb"
 )
