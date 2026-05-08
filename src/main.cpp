@@ -8,14 +8,13 @@
 #include <GLFW/glfw3.h>
 #include <iostream>
 #define STB_IMAGE_IMPLEMENTATION
+#include "Misc/terrain.hpp"
 #include <stb/stb_image.h>
 #include <vector>
-#include "Misc/terrain.hpp"
 
+int width = 1066, height = 600;
 
-int width = 800, height = 600;
-
-Camera camera(45.0f, (float)width / height, 0.1f, 100.0f,
+Camera camera(45.0f, (float)width / height, 0.1f, 1000.0f,
               glm::vec3(0.0f, 0.0f, -1.0f), glm::vec3(0.0f, 1.0f, 3.0f));
 
 void framebuffer_cb(GLFWwindow *window, int width, int height);
@@ -51,7 +50,7 @@ int main() {
     glfwSetScrollCallback(window, scroll_cb);
     glEnable(GL_DEPTH_TEST);
 
-    int*** blockdata = generateWorld();
+    int ***blockdata = generateWorld();
     meshdata = generatefaces(blockdata);
 
     unsigned int VAO, VBO;
@@ -59,13 +58,17 @@ int main() {
     glBindVertexArray(VAO);
     glGenBuffers(1, &VBO);
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, meshdata.size() * sizeof(float), meshdata.data(), GL_STATIC_DRAW);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 6,
+    glBufferData(GL_ARRAY_BUFFER, meshdata.size() * sizeof(float),
+                 meshdata.data(), GL_STATIC_DRAW);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 8,
                           (void *)0);
     glEnableVertexAttribArray(0);
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float),
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float),
                           (void *)(3 * sizeof(float)));
     glEnableVertexAttribArray(1);
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float),
+                          (void *)(6 * sizeof(float)));
+    glEnableVertexAttribArray(2);
     // glBindVertexArray(0);
 
     Shader shader1("shader/vertex.glsl", "shader/fragment.glsl");
@@ -74,10 +77,12 @@ int main() {
     glCullFace(GL_BACK);
     glFrontFace(GL_CCW);
 
-    int tw1, th1, tch1;
+
+    stbi_set_flip_vertically_on_load(1);
+    int tw1, th1, tch1,tw2,th2,tch2;
     unsigned char *sidepro = stbi_load(
-        "/home/leonuraht/Downloads/grass_side.jpg", &tw1, &th1, &tch1, 3);
-    unsigned int texture1;
+        "/home/leonuraht/Downloads/grass_side(1).jpg", &tw1, &th1, &tch1, 3);
+    unsigned int texture1,texture2;
     glGenTextures(1, &texture1);
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, texture1);
@@ -85,24 +90,49 @@ int main() {
                  GL_UNSIGNED_BYTE, sidepro);
     glGenerateMipmap(GL_TEXTURE_2D);
 
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-    
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST); 
-    
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
+                    GL_LINEAR_MIPMAP_LINEAR);
+
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
     stbi_image_free(sidepro);
-   
+    unsigned char *toppro = stbi_load(
+        "/home/leonuraht/Downloads/grass_top.jpg", &tw2, &th2, &tch2, 3);
+    glGenTextures(1, &texture2);
+    glActiveTexture(GL_TEXTURE1);
+    glBindTexture(GL_TEXTURE_2D, texture2);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, tw2, th2, 0, GL_RGB,
+                 GL_UNSIGNED_BYTE, toppro);
+    glGenerateMipmap(GL_TEXTURE_2D);
+
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
+                    GL_LINEAR_MIPMAP_LINEAR);
+
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    stbi_image_free(toppro);
 
     glUseProgram(shader1.program);
     int projectionmat = glGetUniformLocation(shader1.program, "projection"),
         viewmat = glGetUniformLocation(shader1.program, "view"),
-        modelmat = glGetUniformLocation(shader1.program, "model");
+        modelmat = glGetUniformLocation(shader1.program, "model"),
+        lightdir = glGetUniformLocation(shader1.program, "light.dir"),
+        campos = glGetUniformLocation(shader1.program, "campos"),
+        texture00 = glGetUniformLocation(shader1.program, "texture0"),
+        texture01 = glGetUniformLocation(shader1.program,"texture1");
 
     glm::mat4 model = glm::mat4(1.0f);
     glUniformMatrix4fv(modelmat, 1, GL_FALSE, glm::value_ptr(model));
     camera.updatemat(projectionmat, viewmat);
-    glPolygonMode(GL_FRONT_AND_BACK,GL_FILL);
+    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+    glm::vec3 lightd = glm::normalize(glm::vec3(-0.5f, -1.0f, -0.5f));
+    glUniform3f(lightdir, lightd.x, lightd.y, lightd.z);
+    glUniform1i(texture00, 0);
+    glUniform1i(texture01,1);
 
     double pasttime = glfwGetTime();
     while (!glfwWindowShouldClose(window)) {
@@ -110,12 +140,13 @@ int main() {
         double delta = time - pasttime;
         pasttime = time;
         process_inp(window, delta);
-        glClearColor(0.f, 0.f, 0.f, 1.0f);
+        glClearColor(0.3f, 0.5f, 0.7f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         camera.updatevec();
         camera.updatemat(projectionmat, viewmat);
-        glDrawArrays(GL_TRIANGLES,0,meshdata.size()/6);
+        glUniform3f(campos, camera.pos.x, camera.pos.y, camera.pos.z);
+        glDrawArrays(GL_TRIANGLES, 0, meshdata.size() / 8);
 
         glfwSwapBuffers(window);
         glfwPollEvents();
@@ -199,4 +230,3 @@ void scroll_cb(GLFWwindow *window, double x, double y) {
     if (camera.FOV < 1.0f)
         camera.FOV = 1.0f;
 }
-
