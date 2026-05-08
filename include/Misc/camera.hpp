@@ -5,6 +5,12 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
+struct Frustum{
+    float line_right_m,line_right_c;
+    float line_left_m,line_left_c;
+};
+
+
 class Camera {
   public:
     bool isDirty = true,firstmouse = true;
@@ -15,6 +21,9 @@ class Camera {
            glm::vec3 pos);
     void updatevec();
     void updatemat(int projloc, int viewloc);
+    void createFrustum();
+    bool checkfrustum(int x, int z);
 };
+
 
 #endif

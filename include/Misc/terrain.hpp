@@ -4,21 +4,23 @@
 #include <glad/glad.h>
 #include <glm/glm.hpp>
 
-int ***generateWorld();
-std::vector<float> generatefaces(int ***worlddata);
+class Chunk {
+  public:
+    int x, z;
+    int8_t heightmap[324];
+    Chunk(int x, int z);
+    struct chunk_block *blocks;
+    void draw();
+};
+
+
+int ***generateWorld(Chunk& chunk);
+std::vector<float> generatefaces(int ***worlddata,Chunk& chunk);
 void freedata(int ***mat);
 
 struct chunk_block {
     uint8_t posx : 4, posy : 4;
     uint8_t blocktype;
-};
-
-class Chunk {
-  public:
-    int x, y, z;
-    Chunk(int x, int y, int z);
-    struct chunk_block *blocks;
-    void draw();
 };
 
 #endif

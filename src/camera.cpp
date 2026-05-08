@@ -1,6 +1,10 @@
 #include "Misc/camera.hpp"
 #include <glm/gtc/matrix_transform.hpp>
 
+
+struct Frustum frustum;
+
+
 Camera::Camera(float FOV, float aspectratio, float near, float far,
                glm ::vec3 dir, glm::vec3 pos) {
     this->FOV = FOV;
@@ -29,4 +33,8 @@ void Camera::updatemat(int projloc, int viewloc) {
     glUniformMatrix4fv(projloc, 1, GL_FALSE, glm::value_ptr(proj));
     glUniformMatrix4fv(viewloc, 1, GL_FALSE, glm::value_ptr(view));
     isDirty = false;
+}
+
+bool Camera::checkfrustum(int x,int z){
+    return 1; 
 }

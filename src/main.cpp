@@ -13,6 +13,8 @@
 #include <vector>
 
 int width = 1066, height = 600;
+int render_dis = 8;
+
 
 Camera camera(45.0f, (float)width / height, 0.1f, 1000.0f,
               glm::vec3(0.0f, 0.0f, -1.0f), glm::vec3(0.0f, 1.0f, 3.0f));
@@ -22,7 +24,7 @@ void mouse_cb(GLFWwindow *window, double x, double y);
 void scroll_cb(GLFWwindow *window, double x, double y);
 void process_inp(GLFWwindow *window, double delta);
 
-std::vector<float> meshdata;
+std::vector<float> meshdata, meshdata2;
 
 int main() {
     glfwInit();
@@ -49,10 +51,19 @@ int main() {
     glfwSetCursorPosCallback(window, mouse_cb);
     glfwSetScrollCallback(window, scroll_cb);
     glEnable(GL_DEPTH_TEST);
-
-    int ***blockdata = generateWorld();
-    meshdata = generatefaces(blockdata);
-
+    double st = 0,en = 0;
+    st= glfwGetTime();
+    for (int i = -render_dis; i < render_dis; i++) {
+        for (int j = -render_dis; j < render_dis; j++) {
+            Chunk chunk(i, j);
+            int *** blockdata = generateWorld(chunk);
+            meshdata2 = generatefaces(blockdata, chunk);
+            meshdata.reserve(meshdata.size() + meshdata2.size());
+            meshdata.insert(meshdata.end(), meshdata2.begin(), meshdata2.end());
+        }
+    }
+    en = glfwGetTime();
+    std::cout << en - st << std::endl;
     unsigned int VAO, VBO;
     glGenVertexArrays(1, &VAO);
     glBindVertexArray(VAO);
@@ -77,12 +88,11 @@ int main() {
     glCullFace(GL_BACK);
     glFrontFace(GL_CCW);
 
-
     stbi_set_flip_vertically_on_load(1);
-    int tw1, th1, tch1,tw2,th2,tch2;
+    int tw1, th1, tch1, tw2, th2, tch2;
     unsigned char *sidepro = stbi_load(
         "/home/leonuraht/Downloads/grass_side(1).jpg", &tw1, &th1, &tch1, 3);
-    unsigned int texture1,texture2;
+    unsigned int texture1, texture2;
     glGenTextures(1, &texture1);
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, texture1);
@@ -98,8 +108,8 @@ int main() {
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
     stbi_image_free(sidepro);
-    unsigned char *toppro = stbi_load(
-        "/home/leonuraht/Downloads/grass_top.jpg", &tw2, &th2, &tch2, 3);
+    unsigned char *toppro = stbi_load("/home/leonuraht/Downloads/grass_top.jpg",
+                                      &tw2, &th2, &tch2, 3);
     glGenTextures(1, &texture2);
     glActiveTexture(GL_TEXTURE1);
     glBindTexture(GL_TEXTURE_2D, texture2);
@@ -123,7 +133,7 @@ int main() {
         lightdir = glGetUniformLocation(shader1.program, "light.dir"),
         campos = glGetUniformLocation(shader1.program, "campos"),
         texture00 = glGetUniformLocation(shader1.program, "texture0"),
-        texture01 = glGetUniformLocation(shader1.program,"texture1");
+        texture01 = glGetUniformLocation(shader1.program, "texture1");
 
     glm::mat4 model = glm::mat4(1.0f);
     glUniformMatrix4fv(modelmat, 1, GL_FALSE, glm::value_ptr(model));
@@ -132,7 +142,7 @@ int main() {
     glm::vec3 lightd = glm::normalize(glm::vec3(-0.5f, -1.0f, -0.5f));
     glUniform3f(lightdir, lightd.x, lightd.y, lightd.z);
     glUniform1i(texture00, 0);
-    glUniform1i(texture01,1);
+    glUniform1i(texture01, 1);
 
     double pasttime = glfwGetTime();
     while (!glfwWindowShouldClose(window)) {
