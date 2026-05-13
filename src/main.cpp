@@ -11,10 +11,10 @@
 #include "Misc/terrain.hpp"
 #include <stb/stb_image.h>
 #include <vector>
-#include <future>
 
 int width = 1066, height = 600;
 int render_dis = 8;
+
 
 Camera camera(45.0f, (float)width / height, 0.1f, 1000.0f,
               glm::vec3(0.0f, 0.0f, -1.0f), glm::vec3(0.0f, 1.0f, 3.0f));
@@ -51,34 +51,17 @@ int main() {
     glfwSetCursorPosCallback(window, mouse_cb);
     glfwSetScrollCallback(window, scroll_cb);
     glEnable(GL_DEPTH_TEST);
-    double st = 0, en = 0;
-    st = glfwGetTime();
+    double st = 0,en = 0;
+    st= glfwGetTime();
     int thread_chunks = render_dis / 2;
-
-
-    std::vector<std::future<std::vector<float>>> futures;
-
     for (int i = -render_dis; i < render_dis; i++) {
         for (int j = -render_dis; j < render_dis; j++) {
-
-            futures.push_back(
-                std::async(std::launch::async, [i, j, &thread_chunks]() {
-                    Chunk chunk(i, j);
-                    int ***blockdata = generateWorld(chunk, thread_chunks);
-
-                    std::vector<float> local_mesh =
-                        generatefaces(blockdata, chunk, thread_chunks);
-
-                    return local_mesh;
-                }));
+            Chunk chunk(i, j);
+            int *** blockdata = generateWorld(chunk,thread_chunks);
+            meshdata2 = generatefaces(blockdata, chunk,thread_chunks);
+            meshdata.reserve(meshdata.size() + meshdata2.size());
+            meshdata.insert(meshdata.end(), meshdata2.begin(), meshdata2.end());
         }
-    }
-
-    for (auto &f : futures) {
-        std::vector<float> chunk_mesh = f.get();
-
-        meshdata.reserve(meshdata.size() + chunk_mesh.size());
-        meshdata.insert(meshdata.end(), chunk_mesh.begin(), chunk_mesh.end());
     }
     en = glfwGetTime();
     std::cout << en - st << std::endl;

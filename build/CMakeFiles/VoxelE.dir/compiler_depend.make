@@ -380,24 +380,18 @@ CMakeFiles/VoxelE.dir/src/main.cpp.o: /home/leonuraht/storage/CFiles/VoxelE/src/
   /usr/include/asm/posix_types.h \
   /usr/include/asm/posix_types_64.h \
   /usr/include/asm/types.h \
-  /usr/include/asm/unistd.h \
-  /usr/include/asm/unistd_64.h \
   /usr/include/assert.h \
   /usr/include/bits/atomic_wide_counter.h \
   /usr/include/bits/byteswap.h \
-  /usr/include/bits/confname.h \
   /usr/include/bits/cpu-set.h \
   /usr/include/bits/endian.h \
   /usr/include/bits/endianness.h \
-  /usr/include/bits/environments.h \
   /usr/include/bits/errno.h \
   /usr/include/bits/floatn-common.h \
   /usr/include/bits/floatn.h \
   /usr/include/bits/flt-eval-method.h \
   /usr/include/bits/fp-fast.h \
   /usr/include/bits/fp-logb.h \
-  /usr/include/bits/getopt_core.h \
-  /usr/include/bits/getopt_posix.h \
   /usr/include/bits/iscanonical.h \
   /usr/include/bits/libc-header-start.h \
   /usr/include/bits/libm-simd-decl-stubs.h \
@@ -411,13 +405,11 @@ CMakeFiles/VoxelE.dir/src/main.cpp.o: /home/leonuraht/storage/CFiles/VoxelE/src/
   /usr/include/bits/mathcalls.h \
   /usr/include/bits/posix1_lim.h \
   /usr/include/bits/posix2_lim.h \
-  /usr/include/bits/posix_opt.h \
   /usr/include/bits/pthread_stack_min-dynamic.h \
   /usr/include/bits/pthreadtypes-arch.h \
   /usr/include/bits/pthreadtypes.h \
   /usr/include/bits/sched.h \
   /usr/include/bits/select.h \
-  /usr/include/bits/semaphore.h \
   /usr/include/bits/setjmp.h \
   /usr/include/bits/stdint-intn.h \
   /usr/include/bits/stdint-least.h \
@@ -426,7 +418,6 @@ CMakeFiles/VoxelE.dir/src/main.cpp.o: /home/leonuraht/storage/CFiles/VoxelE/src/
   /usr/include/bits/stdlib-float.h \
   /usr/include/bits/struct_mutex.h \
   /usr/include/bits/struct_rwlock.h \
-  /usr/include/bits/syscall.h \
   /usr/include/bits/thread-shared-types.h \
   /usr/include/bits/time.h \
   /usr/include/bits/time64.h \
@@ -460,7 +451,6 @@ CMakeFiles/VoxelE.dir/src/main.cpp.o: /home/leonuraht/storage/CFiles/VoxelE/src/
   /usr/include/bits/typesizes.h \
   /usr/include/bits/uintn-identity.h \
   /usr/include/bits/uio_lim.h \
-  /usr/include/bits/unistd_ext.h \
   /usr/include/bits/waitflags.h \
   /usr/include/bits/waitstatus.h \
   /usr/include/bits/wchar.h \
@@ -468,26 +458,17 @@ CMakeFiles/VoxelE.dir/src/main.cpp.o: /home/leonuraht/storage/CFiles/VoxelE/src/
   /usr/include/bits/wordsize.h \
   /usr/include/bits/xopen_lim.h \
   /usr/include/c++/15.2.1/array \
-  /usr/include/c++/15.2.1/atomic \
   /usr/include/c++/15.2.1/backward/binders.h \
   /usr/include/c++/15.2.1/bit \
   /usr/include/c++/15.2.1/bits/algorithmfwd.h \
-  /usr/include/c++/15.2.1/bits/align.h \
   /usr/include/c++/15.2.1/bits/alloc_traits.h \
-  /usr/include/c++/15.2.1/bits/allocated_ptr.h \
   /usr/include/c++/15.2.1/bits/allocator.h \
-  /usr/include/c++/15.2.1/bits/atomic_base.h \
-  /usr/include/c++/15.2.1/bits/atomic_futex.h \
-  /usr/include/c++/15.2.1/bits/atomic_lockfree_defines.h \
-  /usr/include/c++/15.2.1/bits/atomic_timed_wait.h \
-  /usr/include/c++/15.2.1/bits/atomic_wait.h \
   /usr/include/c++/15.2.1/bits/basic_ios.h \
   /usr/include/c++/15.2.1/bits/basic_ios.tcc \
   /usr/include/c++/15.2.1/bits/basic_string.h \
   /usr/include/c++/15.2.1/bits/basic_string.tcc \
   /usr/include/c++/15.2.1/bits/char_traits.h \
   /usr/include/c++/15.2.1/bits/charconv.h \
-  /usr/include/c++/15.2.1/bits/chrono.h \
   /usr/include/c++/15.2.1/bits/codecvt.h \
   /usr/include/c++/15.2.1/bits/concept_check.h \
   /usr/include/c++/15.2.1/bits/cpp_type_traits.h \
@@ -529,7 +510,6 @@ CMakeFiles/VoxelE.dir/src/main.cpp.o: /home/leonuraht/storage/CFiles/VoxelE/src/
   /usr/include/c++/15.2.1/bits/ostream.h \
   /usr/include/c++/15.2.1/bits/ostream.tcc \
   /usr/include/c++/15.2.1/bits/ostream_insert.h \
-  /usr/include/c++/15.2.1/bits/parse_numbers.h \
   /usr/include/c++/15.2.1/bits/postypes.h \
   /usr/include/c++/15.2.1/bits/predefined_ops.h \
   /usr/include/c++/15.2.1/bits/ptr_traits.h \
@@ -540,14 +520,9 @@ CMakeFiles/VoxelE.dir/src/main.cpp.o: /home/leonuraht/storage/CFiles/VoxelE/src/
   /usr/include/c++/15.2.1/bits/ranges_util.h \
   /usr/include/c++/15.2.1/bits/refwrap.h \
   /usr/include/c++/15.2.1/bits/requires_hosted.h \
-  /usr/include/c++/15.2.1/bits/semaphore_base.h \
-  /usr/include/c++/15.2.1/bits/shared_ptr.h \
-  /usr/include/c++/15.2.1/bits/shared_ptr_base.h \
   /usr/include/c++/15.2.1/bits/specfun.h \
   /usr/include/c++/15.2.1/bits/std_abs.h \
   /usr/include/c++/15.2.1/bits/std_function.h \
-  /usr/include/c++/15.2.1/bits/std_mutex.h \
-  /usr/include/c++/15.2.1/bits/std_thread.h \
   /usr/include/c++/15.2.1/bits/stl_algo.h \
   /usr/include/c++/15.2.1/bits/stl_algobase.h \
   /usr/include/c++/15.2.1/bits/stl_bvector.h \
@@ -565,12 +540,9 @@ CMakeFiles/VoxelE.dir/src/main.cpp.o: /home/leonuraht/storage/CFiles/VoxelE/src/
   /usr/include/c++/15.2.1/bits/streambuf_iterator.h \
   /usr/include/c++/15.2.1/bits/string_view.tcc \
   /usr/include/c++/15.2.1/bits/stringfwd.h \
-  /usr/include/c++/15.2.1/bits/this_thread_sleep.h \
   /usr/include/c++/15.2.1/bits/unicode-data.h \
   /usr/include/c++/15.2.1/bits/unicode.h \
   /usr/include/c++/15.2.1/bits/uniform_int_dist.h \
-  /usr/include/c++/15.2.1/bits/unique_lock.h \
-  /usr/include/c++/15.2.1/bits/unique_ptr.h \
   /usr/include/c++/15.2.1/bits/unordered_map.h \
   /usr/include/c++/15.2.1/bits/uses_allocator.h \
   /usr/include/c++/15.2.1/bits/uses_allocator_args.h \
@@ -587,7 +559,6 @@ CMakeFiles/VoxelE.dir/src/main.cpp.o: /home/leonuraht/storage/CFiles/VoxelE/src/
   /usr/include/c++/15.2.1/cmath \
   /usr/include/c++/15.2.1/compare \
   /usr/include/c++/15.2.1/concepts \
-  /usr/include/c++/15.2.1/condition_variable \
   /usr/include/c++/15.2.1/cstddef \
   /usr/include/c++/15.2.1/cstdint \
   /usr/include/c++/15.2.1/cstdio \
@@ -602,13 +573,11 @@ CMakeFiles/VoxelE.dir/src/main.cpp.o: /home/leonuraht/storage/CFiles/VoxelE/src/
   /usr/include/c++/15.2.1/ext/aligned_buffer.h \
   /usr/include/c++/15.2.1/ext/alloc_traits.h \
   /usr/include/c++/15.2.1/ext/atomicity.h \
-  /usr/include/c++/15.2.1/ext/concurrence.h \
   /usr/include/c++/15.2.1/ext/numeric_traits.h \
   /usr/include/c++/15.2.1/ext/string_conversions.h \
   /usr/include/c++/15.2.1/ext/type_traits.h \
   /usr/include/c++/15.2.1/format \
   /usr/include/c++/15.2.1/functional \
-  /usr/include/c++/15.2.1/future \
   /usr/include/c++/15.2.1/initializer_list \
   /usr/include/c++/15.2.1/ios \
   /usr/include/c++/15.2.1/iosfwd \
@@ -617,18 +586,14 @@ CMakeFiles/VoxelE.dir/src/main.cpp.o: /home/leonuraht/storage/CFiles/VoxelE/src/
   /usr/include/c++/15.2.1/limits \
   /usr/include/c++/15.2.1/locale \
   /usr/include/c++/15.2.1/math.h \
-  /usr/include/c++/15.2.1/mutex \
   /usr/include/c++/15.2.1/new \
   /usr/include/c++/15.2.1/numbers \
   /usr/include/c++/15.2.1/optional \
   /usr/include/c++/15.2.1/ostream \
   /usr/include/c++/15.2.1/pstl/pstl_config.h \
-  /usr/include/c++/15.2.1/ratio \
-  /usr/include/c++/15.2.1/semaphore \
   /usr/include/c++/15.2.1/span \
   /usr/include/c++/15.2.1/stdexcept \
   /usr/include/c++/15.2.1/stdlib.h \
-  /usr/include/c++/15.2.1/stop_token \
   /usr/include/c++/15.2.1/streambuf \
   /usr/include/c++/15.2.1/string \
   /usr/include/c++/15.2.1/string_view \
@@ -854,7 +819,6 @@ CMakeFiles/VoxelE.dir/src/main.cpp.o: /home/leonuraht/storage/CFiles/VoxelE/src/
   /usr/include/gnu/stubs.h \
   /usr/include/libintl.h \
   /usr/include/limits.h \
-  /usr/include/linux/close_range.h \
   /usr/include/linux/errno.h \
   /usr/include/linux/limits.h \
   /usr/include/linux/posix_types.h \
@@ -865,7 +829,6 @@ CMakeFiles/VoxelE.dir/src/main.cpp.o: /home/leonuraht/storage/CFiles/VoxelE/src/
   /usr/include/math.h \
   /usr/include/pthread.h \
   /usr/include/sched.h \
-  /usr/include/semaphore.h \
   /usr/include/stb/stb_image.h \
   /usr/include/stdc-predef.h \
   /usr/include/stdint.h \
@@ -876,12 +839,8 @@ CMakeFiles/VoxelE.dir/src/main.cpp.o: /home/leonuraht/storage/CFiles/VoxelE/src/
   /usr/include/sys/cdefs.h \
   /usr/include/sys/select.h \
   /usr/include/sys/single_threaded.h \
-  /usr/include/sys/syscall.h \
-  /usr/include/sys/time.h \
   /usr/include/sys/types.h \
-  /usr/include/syscall.h \
   /usr/include/time.h \
-  /usr/include/unistd.h \
   /usr/include/wchar.h \
   /usr/include/wctype.h \
   /usr/lib/gcc/x86_64-pc-linux-gnu/15.2.1/include/emmintrin.h \
@@ -1664,20 +1623,6 @@ CMakeFiles/VoxelE.dir/src/terrain.cpp.o:
 
 /usr/lib/libstdc++.so:
 
-/usr/lib/libm.so:
-
-/usr/lib/libgcc_s.so.1:
-
-/usr/lib/libdl.a:
-
-/usr/lib/crti.o:
-
-/usr/lib/Scrt1.o:
-
-/usr/include/c++/15.2.1/thread:
-
-/home/leonuraht/storage/CFiles/VoxelE/src/terrain.cpp:
-
 /usr/include/glm/ext/vector_double3.hpp:
 
 /usr/include/glm/ext/quaternion_float.hpp:
@@ -1768,8 +1713,6 @@ CMakeFiles/VoxelE.dir/src/terrain.cpp.o:
 
 /usr/include/glm/detail/type_mat4x3.hpp:
 
-/usr/include/c++/15.2.1/condition_variable:
-
 /usr/include/glm/detail/type_mat3x4.inl:
 
 /usr/include/bits/waitstatus.h:
@@ -1796,10 +1739,6 @@ CMakeFiles/VoxelE.dir/src/terrain.cpp.o:
 
 /usr/include/sys/syscall.h:
 
-/usr/lib/libgcc_s.so:
-
-/usr/include/glm/detail/type_half.hpp:
-
 /usr/include/glm/detail/type_float.hpp:
 
 /usr/include/glm/vector_relational.hpp:
@@ -1812,9 +1751,9 @@ CMakeFiles/VoxelE.dir/src/terrain.cpp.o:
 
 /usr/include/glm/detail/func_matrix.inl:
 
-/usr/include/c++/15.2.1/bits/parse_numbers.h:
-
 /usr/include/c++/15.2.1/x86_64-pc-linux-gnu/bits/atomic_word.h:
+
+/usr/include/c++/15.2.1/bits/parse_numbers.h:
 
 /usr/include/glm/detail/func_integer.inl:
 
@@ -1878,11 +1817,11 @@ CMakeFiles/VoxelE.dir/src/terrain.cpp.o:
 
 /usr/include/c++/15.2.1/bits/hashtable.h:
 
+/usr/include/c++/15.2.1/iosfwd:
+
 /usr/include/glm/detail/type_mat4x2.inl:
 
 /usr/include/c++/15.2.1/bits/atomic_lockfree_defines.h:
-
-/usr/include/c++/15.2.1/iosfwd:
 
 /usr/include/glm/detail/compute_vector_decl.hpp:
 
@@ -1894,9 +1833,9 @@ CMakeFiles/VoxelE.dir/src/terrain.cpp.o:
 
 /usr/include/c++/15.2.1/tuple:
 
-/usr/include/bits/getopt_posix.h:
-
 /usr/include/errno.h:
+
+/usr/include/bits/getopt_posix.h:
 
 /usr/include/bits/types/clockid_t.h:
 
@@ -1982,6 +1921,8 @@ CMakeFiles/VoxelE.dir/src/terrain.cpp.o:
 
 /usr/include/glm/ext/vector_double2_precision.hpp:
 
+/usr/lib/libdl.a:
+
 /usr/include/c++/15.2.1/bit:
 
 /usr/include/c++/15.2.1/bits/exception_defines.h:
@@ -1991,6 +1932,10 @@ CMakeFiles/VoxelE.dir/src/terrain.cpp.o:
 /usr/include/glm/packing.hpp:
 
 /usr/include/c++/15.2.1/cstddef:
+
+/usr/include/glm/detail/type_half.hpp:
+
+/usr/lib/libgcc_s.so:
 
 /usr/include/c++/15.2.1/bits/uses_allocator.h:
 
@@ -2009,8 +1954,6 @@ CMakeFiles/VoxelE.dir/src/terrain.cpp.o:
 /usr/include/c++/15.2.1/bits/locale_classes.h:
 
 /usr/include/glm/ext/vector_int3_sized.hpp:
-
-/usr/include/c++/15.2.1/bits/atomic_futex.h:
 
 /usr/include/c++/15.2.1/bits/semaphore_base.h:
 
@@ -2050,11 +1993,11 @@ CMakeFiles/VoxelE.dir/src/shader.cpp.o:
 
 /usr/include/c++/15.2.1/tr1/riemann_zeta.tcc:
 
-/usr/include/asm/unistd_64.h:
-
 /usr/include/c++/15.2.1/bits/string_view.tcc:
 
 /usr/include/bits/types/__fpos_t.h:
+
+/usr/include/asm/unistd_64.h:
 
 /home/leonuraht/storage/CFiles/VoxelE/src/camera.cpp:
 
@@ -2099,8 +2042,6 @@ CMakeFiles/VoxelE.dir/src/shader.cpp.o:
 /usr/include/c++/15.2.1/array:
 
 /usr/include/c++/15.2.1/new:
-
-/usr/include/c++/15.2.1/bits/shared_ptr_base.h:
 
 /usr/include/bits/long-double.h:
 
@@ -2155,8 +2096,6 @@ CMakeFiles/VoxelE.dir/src/shader.cpp.o:
 /usr/include/c++/15.2.1/backward/binders.h:
 
 /usr/include/glm/vec2.hpp:
-
-/usr/include/c++/15.2.1/ext/concurrence.h:
 
 /usr/include/c++/15.2.1/cctype:
 
@@ -2244,9 +2183,9 @@ CMakeFiles/VoxelE.dir/src/main.cpp.o:
 
 /usr/include/asm-generic/bitsperlong.h:
 
-/usr/lib/libc.so:
-
 /usr/include/c++/15.2.1/bits/basic_string.h:
+
+/usr/lib/libc.so:
 
 /usr/include/glm/mat2x4.hpp:
 
@@ -2273,6 +2212,8 @@ CMakeFiles/VoxelE.dir/src/main.cpp.o:
 /usr/include/c++/15.2.1/bits/version.h:
 
 /usr/include/glm/ext/matrix_double4x2_precision.hpp:
+
+/home/leonuraht/storage/CFiles/VoxelE/src/terrain.cpp:
 
 /usr/include/glm/ext/matrix_float2x2.hpp:
 
@@ -2328,19 +2269,13 @@ CMakeFiles/VoxelE.dir/src/main.cpp.o:
 
 /usr/include/glm/ext/vector_bool3_precision.hpp:
 
-/usr/include/c++/15.2.1/bits/align.h:
-
 /usr/include/glm/ext/matrix_double3x3.hpp:
-
-/usr/include/c++/15.2.1/bits/allocated_ptr.h:
 
 /usr/include/c++/15.2.1/ext/alloc_traits.h:
 
-/usr/include/bits/unistd_ext.h:
-
 /usr/include/c++/15.2.1/bits/unicode.h:
 
-/usr/include/c++/15.2.1/mutex:
+/usr/include/bits/unistd_ext.h:
 
 /usr/include/c++/15.2.1/bits/charconv.h:
 
@@ -2514,6 +2449,8 @@ CMakeFiles/VoxelE.dir/src/camera.cpp.o:
 
 /usr/include/glm/trigonometric.hpp:
 
+/usr/lib/crti.o:
+
 /usr/include/glm/vec3.hpp:
 
 /usr/lib/gcc/x86_64-pc-linux-gnu/15.2.1/include/stdint.h:
@@ -2572,31 +2509,15 @@ CMakeFiles/VoxelE.dir/src/camera.cpp.o:
 
 /usr/include/asm/types.h:
 
-/usr/include/glm/mat2x3.hpp:
-
-/usr/include/asm/unistd.h:
-
-/usr/include/bits/confname.h:
-
 /usr/include/bits/cpu-set.h:
 
 /usr/include/c++/15.2.1/bits/streambuf.tcc:
-
-/usr/include/bits/environments.h:
-
-/usr/include/bits/types/struct_FILE.h:
-
-/usr/include/c++/15.2.1/bits/std_thread.h:
 
 /usr/include/bits/errno.h:
 
 /usr/include/bits/locale.h:
 
-/usr/include/bits/semaphore.h:
-
 /usr/include/bits/setjmp.h:
-
-/usr/include/bits/syscall.h:
 
 /usr/include/bits/timex.h:
 
@@ -2612,29 +2533,17 @@ CMakeFiles/VoxelE.dir/src/camera.cpp.o:
 
 /usr/include/bits/types/mbstate_t.h:
 
+/usr/include/bits/types/struct_FILE.h:
+
+/usr/include/bits/environments.h:
+
+/usr/include/c++/15.2.1/bits/std_thread.h:
+
 /usr/include/bits/types/struct_sched_param.h:
-
-/usr/include/c++/15.2.1/atomic:
-
-/usr/include/c++/15.2.1/x86_64-pc-linux-gnu/bits/gthr-default.h:
-
-/usr/include/c++/15.2.1/format:
-
-/usr/include/c++/15.2.1/bits/atomic_base.h:
-
-/usr/include/c++/15.2.1/bits/atomic_wait.h:
-
-/usr/include/semaphore.h:
 
 /usr/include/c++/15.2.1/bits/basic_ios.tcc:
 
 /usr/include/c++/15.2.1/bits/char_traits.h:
-
-/usr/include/c++/15.2.1/bits/stl_function.h:
-
-/usr/include/sys/select.h:
-
-/usr/include/c++/15.2.1/bits/chrono.h:
 
 /usr/include/c++/15.2.1/bits/exception_ptr.h:
 
@@ -2674,21 +2583,11 @@ CMakeFiles/VoxelE.dir/src/camera.cpp.o:
 
 /usr/include/c++/15.2.1/bits/postypes.h:
 
-/usr/include/c++/15.2.1/bits/shared_ptr.h:
-
-/usr/include/asm-generic/errno.h:
-
-/usr/include/sys/single_threaded.h:
-
 /usr/include/c++/15.2.1/bits/unicode-data.h:
 
 /usr/include/c++/15.2.1/bits/uniform_int_dist.h:
 
 /usr/include/c++/15.2.1/cwchar:
-
-/usr/include/c++/15.2.1/bits/unique_lock.h:
-
-/usr/include/c++/15.2.1/bits/unique_ptr.h:
 
 /usr/include/c++/15.2.1/clocale:
 
@@ -2700,7 +2599,11 @@ CMakeFiles/VoxelE.dir/src/camera.cpp.o:
 
 /usr/include/c++/15.2.1/ext/string_conversions.h:
 
-/usr/include/c++/15.2.1/future:
+/usr/include/c++/15.2.1/x86_64-pc-linux-gnu/bits/gthr-default.h:
+
+/usr/include/c++/15.2.1/format:
+
+/usr/include/c++/15.2.1/atomic:
 
 /usr/include/c++/15.2.1/math.h:
 
@@ -2750,15 +2653,13 @@ CMakeFiles/VoxelE.dir/src/camera.cpp.o:
 
 /usr/include/linux/stddef.h:
 
-/usr/include/sys/time.h:
+/usr/include/asm-generic/errno.h:
 
-/usr/include/syscall.h:
+/usr/include/sys/single_threaded.h:
 
 /usr/include/time.h:
 
 /usr/include/c++/15.2.1/bits/fstream.tcc:
-
-/usr/include/unistd.h:
 
 /usr/lib/gcc/x86_64-pc-linux-gnu/15.2.1/include/emmintrin.h:
 
@@ -2783,3 +2684,41 @@ CMakeFiles/VoxelE.dir/src/camera.cpp.o:
 /usr/include/c++/15.2.1/x86_64-pc-linux-gnu/bits/basic_file.h:
 
 /usr/include/c++/15.2.1/x86_64-pc-linux-gnu/bits/c++io.h:
+
+/usr/include/glm/mat2x3.hpp:
+
+/usr/include/asm/unistd.h:
+
+/usr/include/bits/confname.h:
+
+/usr/include/bits/semaphore.h:
+
+/usr/include/bits/syscall.h:
+
+/usr/include/c++/15.2.1/bits/atomic_base.h:
+
+/usr/include/c++/15.2.1/bits/atomic_wait.h:
+
+/usr/include/semaphore.h:
+
+/usr/include/c++/15.2.1/bits/stl_function.h:
+
+/usr/include/sys/select.h:
+
+/usr/include/c++/15.2.1/bits/chrono.h:
+
+/usr/include/c++/15.2.1/bits/unique_ptr.h:
+
+/usr/include/c++/15.2.1/thread:
+
+/usr/include/sys/time.h:
+
+/usr/include/syscall.h:
+
+/usr/include/unistd.h:
+
+/usr/lib/Scrt1.o:
+
+/usr/lib/libgcc_s.so.1:
+
+/usr/lib/libm.so:
