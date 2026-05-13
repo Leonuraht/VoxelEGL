@@ -14,8 +14,8 @@ class Chunk {
 };
 
 
-int ***generateWorld(Chunk& chunk);
-std::vector<float> generatefaces(int ***worlddata,Chunk& chunk);
+int ***generateWorld(Chunk& chunk,int threadch);
+std::vector<float> generatefaces(int ***worlddata,Chunk& chunk,int threadch);
 void freedata(int ***mat);
 
 struct chunk_block {

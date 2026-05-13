@@ -73,45 +73,12 @@ float bottomface[] = {
     -0.5f, -0.5f, -0.5f, 0.0f, -1.0f, 0.0f, 0.0f, 0.0f  // Bottom-Left
 };
 
-void add_face_right(std::vector<float>& mesh, Chunk &chunk, int hIdx, float xoff,
-                    float yoff, float zoff, int i, int j, int k, int ***data);
+void add_faces(std::vector<float> &mesh, Chunk &chunk, int ***data);
 
-void add_face_top(std::vector<float>& mesh, Chunk &chunk, int hIdx, float xoff,
-                  float yoff, float zoff, int i, int j, int k, int ***data);
-void add_face_bottom(std::vector<float>& mesh, Chunk &chunk, int hIdx,
-                     float xoff, float yoff, float zoff, int i, int j, int k,
-                     int ***data);
-void add_face_left(std::vector<float>& mesh, Chunk &chunk, int hIdx, float xoff,
-                   float yoff, float zoff, int i, int j, int k, int ***data);
-void add_face_front(std::vector<float>& mesh, Chunk &chunk, int hIdx, float xoff,
-                    float yoff, float zoff, int i, int j, int k, int ***data);
-void add_face_back(std::vector<float>& mesh, Chunk &chunk, int hIdx, float xoff,
-                   float yoff, float zoff, int i, int j, int k, int ***data);
-
-std::vector<float> generatefaces(int ***data, Chunk &chunk) {
+std::vector<float> generatefaces(int ***data, Chunk &chunk,int threadchunks) {
     std::vector<float> mesh;
-    std::vector<std::thread> workers;
     mesh.reserve(20000);
-    for (int i = 0; i < 16; i++) {
-        for (int j = 0; j < yl; j++) {
-            for (int k = 0; k < 16; k++) {
-                if (data[i][j][k] <= 0)
-                    continue;
-                int hIdx = (i + 1) + (k + 1) * 18;
-                float xoff = i + chunk.x * 16, yoff = j - yl / 2.f,
-                      zoff = k + chunk.z * 16;
-                add_face_top(mesh, chunk, 0, xoff, yoff, zoff, i, j, k, data);
-                add_face_right(mesh, chunk, hIdx, xoff, yoff, zoff, i, j, k, data);
-                add_face_bottom(mesh, chunk, 0, xoff, yoff, zoff, i, j, k,
-                                data);
-                add_face_left(mesh, chunk, hIdx, xoff, yoff, zoff, i, j, k, data);
-                add_face_front(mesh, chunk, hIdx, xoff, yoff, zoff, i, j, k, data);
-                add_face_back(mesh, chunk, hIdx, xoff, yoff, zoff, i, j, k, data);
-
-                for(auto &t : workers) t.join();
-            }
-        }
-    }
+    add_faces(mesh, chunk, data);
     freedata(data);
     return mesh;
 }
@@ -193,7 +160,7 @@ void generateheightmap(Chunk &chunk) {
     }
 }
 
-int ***generateWorld(Chunk &chunk) {
+int ***generateWorld(Chunk &chunk,int threadchunks) {
     int ***blockdata = (int ***)malloc(16 * sizeof(int **));
     for (int i = 0; i < 16; i++) {
         blockdata[i] = (int **)malloc(yl * sizeof(int *));
@@ -225,105 +192,95 @@ void freedata(int ***mat) {
     free(mat);
 }
 
-void add_face_right(std::vector<float>& mesh, Chunk &chunk, int hIdx, float xoff,
-                    float yoff, float zoff, int i, int j, int k, int ***data) {
-    if (i == 15 && j < chunk.heightmap[hIdx + 1]) {
-    } else if (i == 15 || data[i + 1][j][k] == 0) {
-        for (int v = 0; v < 48; v += 8) {
-            mesh.push_back(rightface[v] + xoff);
-            mesh.push_back(rightface[v + 1] + yoff);
-            mesh.push_back(rightface[v + 2] + zoff);
-            mesh.push_back(rightface[v + 3]);
-            mesh.push_back(rightface[v + 4]);
-            mesh.push_back(rightface[v + 5]);
-            mesh.push_back(rightface[v + 6]);
-            mesh.push_back(rightface[v + 7]);
-        }
-    }
-}
+void add_faces(std::vector<float> &mesh, Chunk &chunk, int ***data) {
+    std::vector<std::thread> workers;
+    mesh.reserve(2000);
+    for (int i = 0; i < 16; i++) {
+        for (int j = 0; j < yl; j++) {
+            for (int k = 0; k < 16; k++) {
+                if (data[i][j][k] <= 0)
+                    continue;
+                int hIdx = (i + 1) + (k + 1) * 18;
+                float xoff = i + chunk.x * 16, yoff = j - yl / 2.f,
+                      zoff = k + chunk.z * 16;
+                if (i == 15 && j < chunk.heightmap[hIdx + 1]) {
+                } else if (i == 15 || data[i + 1][j][k] == 0) {
+                    for (int v = 0; v < 48; v += 8) {
+                        mesh.push_back(rightface[v] + xoff);
+                        mesh.push_back(rightface[v + 1] + yoff);
+                        mesh.push_back(rightface[v + 2] + zoff);
+                        mesh.push_back(rightface[v + 3]);
+                        mesh.push_back(rightface[v + 4]);
+                        mesh.push_back(rightface[v + 5]);
+                        mesh.push_back(rightface[v + 6]);
+                        mesh.push_back(rightface[v + 7]);
+                    }
+                }
+                if (i == 0 && j < chunk.heightmap[hIdx - 1]) {
 
-void add_face_left(std::vector<float>& mesh, Chunk &chunk, int hIdx, float xoff,
-                   float yoff, float zoff, int i, int j, int k, int ***data) {
-    if (i == 0 && j < chunk.heightmap[hIdx - 1]) {
-
-    } else if (i == 0 || data[i - 1][j][k] == 0) {
-        for (int v = 0; v < 48; v += 8) {
-            mesh.push_back(leftface[v] + xoff);
-            mesh.push_back(leftface[v + 1] + yoff);
-            mesh.push_back(leftface[v + 2] + zoff);
-            mesh.push_back(leftface[v + 3]);
-            mesh.push_back(leftface[v + 4]);
-            mesh.push_back(leftface[v + 5]);
-            mesh.push_back(leftface[v + 6]);
-            mesh.push_back(leftface[v + 7]);
-        }
-    }
-}
-
-void add_face_top(std::vector<float>& mesh, Chunk &chunk, int hIdx, float xoff,
-                  float yoff, float zoff, int i, int j, int k, int ***data) {
-    if (j == yl - 1 || data[i][j + 1][k] == 0) {
-        for (int v = 0; v < 48; v += 8) {
-            mesh.push_back(topface[v] + xoff);
-            mesh.push_back(topface[v + 1] + yoff);
-            mesh.push_back(topface[v + 2] + zoff);
-            mesh.push_back(topface[v + 3]);
-            mesh.push_back(topface[v + 4]);
-            mesh.push_back(topface[v + 5]);
-            mesh.push_back(topface[v + 6]);
-            mesh.push_back(topface[v + 7]);
-        }
-    }
-}
-
-void add_face_front(std::vector<float>& mesh, Chunk &chunk, int hIdx, float xoff,
-                    float yoff, float zoff, int i, int j, int k, int ***data) {
-    if (k == 15 && j < chunk.heightmap[hIdx + 18]) {
-    } else if (k == 15 || data[i][j][k + 1] == 0) {
-        for (int v = 0; v < 48; v += 8) {
-            mesh.push_back(frontface[v] + xoff);
-            mesh.push_back(frontface[v + 1] + yoff);
-            mesh.push_back(frontface[v + 2] + zoff);
-            mesh.push_back(frontface[v + 3]);
-            mesh.push_back(frontface[v + 4]);
-            mesh.push_back(frontface[v + 5]);
-            mesh.push_back(frontface[v + 6]);
-            mesh.push_back(frontface[v + 7]);
-        }
-    }
-}
-
-void add_face_back(std::vector<float>& mesh, Chunk &chunk, int hIdx, float xoff,
-                   float yoff, float zoff, int i, int j, int k, int ***data) {
-    if (k == 0 && j < chunk.heightmap[hIdx - 18]) {
-    } else if (k == 0 || data[i][j][k - 1] == 0) {
-        for (int v = 0; v < 48; v += 8) {
-            mesh.push_back(backface[v] + xoff);
-            mesh.push_back(backface[v + 1] + yoff);
-            mesh.push_back(backface[v + 2] + zoff);
-            mesh.push_back(backface[v + 3]);
-            mesh.push_back(backface[v + 4]);
-            mesh.push_back(backface[v + 5]);
-            mesh.push_back(backface[v + 6]);
-            mesh.push_back(backface[v + 7]);
-        }
-    }
-}
-
-void add_face_bottom(std::vector<float>& mesh, Chunk &chunk, int hIdx,
-                     float xoff, float yoff, float zoff, int i, int j, int k,
-                     int ***data) {
-
-    if (j != 0 && data[i][j - 1][k] == 0) {
-        for (int v = 0; v < 48; v += 8) {
-            mesh.push_back(bottomface[v] + xoff);
-            mesh.push_back(bottomface[v + 1] + yoff);
-            mesh.push_back(bottomface[v + 2] + zoff);
-            mesh.push_back(bottomface[v + 3]);
-            mesh.push_back(bottomface[v + 4]);
-            mesh.push_back(bottomface[v + 5]);
-            mesh.push_back(bottomface[v + 6]);
-            mesh.push_back(bottomface[v + 7]);
+                } else if (i == 0 || data[i - 1][j][k] == 0) {
+                    for (int v = 0; v < 48; v += 8) {
+                        mesh.push_back(leftface[v] + xoff);
+                        mesh.push_back(leftface[v + 1] + yoff);
+                        mesh.push_back(leftface[v + 2] + zoff);
+                        mesh.push_back(leftface[v + 3]);
+                        mesh.push_back(leftface[v + 4]);
+                        mesh.push_back(leftface[v + 5]);
+                        mesh.push_back(leftface[v + 6]);
+                        mesh.push_back(leftface[v + 7]);
+                    }
+                }
+                if (j == yl - 1 || data[i][j + 1][k] == 0) {
+                    for (int v = 0; v < 48; v += 8) {
+                        mesh.push_back(topface[v] + xoff);
+                        mesh.push_back(topface[v + 1] + yoff);
+                        mesh.push_back(topface[v + 2] + zoff);
+                        mesh.push_back(topface[v + 3]);
+                        mesh.push_back(topface[v + 4]);
+                        mesh.push_back(topface[v + 5]);
+                        mesh.push_back(topface[v + 6]);
+                        mesh.push_back(topface[v + 7]);
+                    }
+                }
+                if (k == 15 && j < chunk.heightmap[hIdx + 18]) {
+                } else if (k == 15 || data[i][j][k + 1] == 0) {
+                    for (int v = 0; v < 48; v += 8) {
+                        mesh.push_back(frontface[v] + xoff);
+                        mesh.push_back(frontface[v + 1] + yoff);
+                        mesh.push_back(frontface[v + 2] + zoff);
+                        mesh.push_back(frontface[v + 3]);
+                        mesh.push_back(frontface[v + 4]);
+                        mesh.push_back(frontface[v + 5]);
+                        mesh.push_back(frontface[v + 6]);
+                        mesh.push_back(frontface[v + 7]);
+                    }
+                }
+                if (k == 0 && j < chunk.heightmap[hIdx - 18]) {
+                } else if (k == 0 || data[i][j][k - 1] == 0) {
+                    for (int v = 0; v < 48; v += 8) {
+                        mesh.push_back(backface[v] + xoff);
+                        mesh.push_back(backface[v + 1] + yoff);
+                        mesh.push_back(backface[v + 2] + zoff);
+                        mesh.push_back(backface[v + 3]);
+                        mesh.push_back(backface[v + 4]);
+                        mesh.push_back(backface[v + 5]);
+                        mesh.push_back(backface[v + 6]);
+                        mesh.push_back(backface[v + 7]);
+                    }
+                }
+                if (j != 0 && data[i][j - 1][k] == 0) {
+                    for (int v = 0; v < 48; v += 8) {
+                        mesh.push_back(bottomface[v] + xoff);
+                        mesh.push_back(bottomface[v + 1] + yoff);
+                        mesh.push_back(bottomface[v + 2] + zoff);
+                        mesh.push_back(bottomface[v + 3]);
+                        mesh.push_back(bottomface[v + 4]);
+                        mesh.push_back(bottomface[v + 5]);
+                        mesh.push_back(bottomface[v + 6]);
+                        mesh.push_back(bottomface[v + 7]);
+                    }
+                }
+            }
         }
     }
 }
