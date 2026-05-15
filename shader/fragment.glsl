@@ -36,7 +36,7 @@ vec3 calcDirLight(vec3 fragpos, vec3 ldir, vec3 campos, vec3 norm) {
 void main() {
     vec3 norr = normalize(normal);
     vec3 ans = calcDirLight(fragpos, light.dir, campos, norr);
-    // if (normal.y > 0.5f) fragcolor = vec4(pow(vec3(texture(texture1, Texcord)) * ans, vec3(1 / 2.2f)), 1.0f);
-    // else fragcolor = vec4(pow(vec3(texture(texture0, Texcord)) * ans, vec3(1 / 2.2f)), 1.0f);
-    fragcolor = vec4(pow(vec3(0.26f,0.81f,0.218f) * ans, vec3(1 / 2.2f)), 1.0f);
+    if (normal.y > 0.5f) fragcolor = vec4(pow(vec3(texture(texture1, Texcord)) * ans, vec3(1 / 2.2f)), 1.0f);
+    else fragcolor = vec4(pow(vec3(texture(texture0, Texcord)) * ans, vec3(1 / 2.2f)), 1.0f);
+    // fragcolor = vec4(pow(vec3(0.26f,0.81f,0.218f) * ans, vec3(1 / 2.2f)), 1.0f);
 }

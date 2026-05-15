@@ -12,14 +12,13 @@ class Chunk {
     struct chunk_block *blocks;
 };
 
+typedef struct {
+    uint32_t data;
+} Vertex;
 
-uint8_t* generateWorld(Chunk& chunk,int threadch);
-std::vector<float> generatefaces(uint8_t* worlddata,Chunk& chunk,int threadch);
-void freedata(uint8_t* mat);
-
-struct chunk_block {
-    uint8_t posx : 4, posy : 4;
-    uint8_t blocktype;
-};
+uint8_t *generateWorld(Chunk &chunk, int threadch);
+std::vector<Vertex> generatefaces(uint8_t *worlddata, Chunk &chunk,
+                                 int threadch);
+void freedata(uint8_t *mat);
 
 #endif

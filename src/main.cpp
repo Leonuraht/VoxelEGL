@@ -17,7 +17,7 @@ int width = 1066, height = 600;
 const int render_dis = 16;
 float playerx = 0, playerz = 0, playerxprev = 0, playerzprev = 0;
 const int render_index = render_dis * render_dis * 4;
-std::vector<float> meshdata[render_index];
+std::vector<Vertex> meshdata[render_index];
 int thread_chunks = render_dis / 2;
 int render_valll = render_dis * 2;
 unsigned int VAO[render_index] = {0}, VBO[render_index] = {0};
@@ -129,7 +129,8 @@ int main() {
         lightdir = glGetUniformLocation(shader1.program, "light.dir"),
         campos = glGetUniformLocation(shader1.program, "campos"),
         texture00 = glGetUniformLocation(shader1.program, "texture0"),
-        texture01 = glGetUniformLocation(shader1.program, "texture1");
+        texture01 = glGetUniformLocation(shader1.program, "texture1"),
+        chunk_cord = glGetUniformLocation(shader1.program, "chunk_cord");
 
     glm::mat4 model = glm::mat4(1.0f);
     glUniformMatrix4fv(modelmat, 1, GL_FALSE, glm::value_ptr(model));
@@ -159,12 +160,12 @@ int main() {
         for (int i = 0; i < render_index; i++) {
             if (!chunk_loaded[i] || meshdata[i].empty())
                 continue;
-            if (!(camera.checkfrustum(
-                    chunks_index[i].x,
-                    chunks_index[i].z)))
+            if (!(camera.checkfrustum(chunks_index[i].x, chunks_index[i].z)))
                 continue;
+            glUniform2f(chunk_cord, chunks_index[i].x << 4,
+                        chunks_index[i].z << 4);
             glBindVertexArray(VAO[i]);
-            glDrawArrays(GL_TRIANGLES, 0, meshdata[i].size() / 8);
+            glDrawArraysInstanced(GL_TRIANGLES, 0, 6, meshdata[i].size());
         }
         glfwSwapBuffers(window);
         glfwPollEvents();
@@ -302,17 +303,12 @@ void generate_world(int thread_chunks, int render_valll, int x, int z,
         glBindVertexArray(VAO[i]);
         glGenBuffers(1, &VBO[i]);
         glBindBuffer(GL_ARRAY_BUFFER, VBO[i]);
-        glBufferData(GL_ARRAY_BUFFER, meshdata[i].size() * sizeof(float),
+        glBufferData(GL_ARRAY_BUFFER, meshdata[i].size() * sizeof(uint32_t),
                      meshdata[i].data(), GL_STATIC_DRAW);
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 8,
-                              (void *)0);
+        glVertexAttribIPointer(0, 1, GL_UNSIGNED_INT, sizeof(uint32_t),
+                               (void *)0);
+        glVertexAttribDivisor(0, 1);
         glEnableVertexAttribArray(0);
-        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float),
-                              (void *)(3 * sizeof(float)));
-        glEnableVertexAttribArray(1);
-        glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float),
-                              (void *)(6 * sizeof(float)));
-        glEnableVertexAttribArray(2);
         glBindVertexArray(0);
     }
 }

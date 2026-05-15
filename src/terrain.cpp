@@ -3,89 +3,23 @@
 #include <cstdint>
 #include <cstdlib>
 // #include <iostream>
-
-struct Vertex{
-    uint32_t x : 5,y : 8,z : 5,normal : 3,texture:3;
-};
-
-int xl = 100, yl = 200, zl = 100;
+int yl = 256;
 
 Chunk::Chunk(int x, int z) {
     this->x = x;
     this->z = z;
 }
 
+void add_faces(Vertex *mesh_buffer, int &v_count, Chunk &chunk, uint8_t *data);
 
-float frontface[] = {
-    // --- Front Face (Z = +0.5) ---          // UV Coordinates
-    -0.5f, -0.5f, 0.5f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, // Bottom-Left
-    0.5f,  -0.5f, 0.5f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f, // Bottom-Right
-    0.5f,  0.5f,  0.5f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f, // Top-Right
-    0.5f,  0.5f,  0.5f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f, // Top-Right
-    -0.5f, 0.5f,  0.5f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, // Top-Left
-    -0.5f, -0.5f, 0.5f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, // Bottom-Left
-};
-
-float backface[] = {
-    // --- Back Face (Z = -0.5) ---           // UV Coordinates
-    0.5f,  -0.5f, -0.5f, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f, // Bottom-Left
-    -0.5f, -0.5f, -0.5f, 0.0f, 0.0f, -1.0f, 1.0f, 0.0f, // Bottom-Right
-    -0.5f, 0.5f,  -0.5f, 0.0f, 0.0f, -1.0f, 1.0f, 1.0f, // Top-Right
-    -0.5f, 0.5f,  -0.5f, 0.0f, 0.0f, -1.0f, 1.0f, 1.0f, // Top-Right
-    0.5f,  0.5f,  -0.5f, 0.0f, 0.0f, -1.0f, 0.0f, 1.0f, // Top-Left
-    0.5f,  -0.5f, -0.5f, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f, // Bottom-Left
-};
-
-float leftface[] = {
-    // --- Left Face (X = -0.5) ---           // UV Coordinates
-    -0.5f, -0.5f, -0.5f, -1.0f, 0.0f, 0.0f, 0.0f, 0.0f, // Bottom-Left
-    -0.5f, -0.5f, 0.5f,  -1.0f, 0.0f, 0.0f, 1.0f, 0.0f, // Bottom-Right
-    -0.5f, 0.5f,  0.5f,  -1.0f, 0.0f, 0.0f, 1.0f, 1.0f, // Top-Right
-    -0.5f, 0.5f,  0.5f,  -1.0f, 0.0f, 0.0f, 1.0f, 1.0f, // Top-Right
-    -0.5f, 0.5f,  -0.5f, -1.0f, 0.0f, 0.0f, 0.0f, 1.0f, // Top-Left
-    -0.5f, -0.5f, -0.5f, -1.0f, 0.0f, 0.0f, 0.0f, 0.0f, // Bottom-Left
-};
-
-float rightface[] = {
-    // --- Right Face (X = +0.5) ---          // UV Coordinates
-    0.5f, -0.5f, 0.5f,  1.0f, 0.0f, 0.0f, 0.0f, 0.0f, // Bottom-Left
-    0.5f, -0.5f, -0.5f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, // Bottom-Right
-    0.5f, 0.5f,  -0.5f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f, // Top-Right
-    0.5f, 0.5f,  -0.5f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f, // Top-Right
-    0.5f, 0.5f,  0.5f,  1.0f, 0.0f, 0.0f, 0.0f, 1.0f, // Top-Left
-    0.5f, -0.5f, 0.5f,  1.0f, 0.0f, 0.0f, 0.0f, 0.0f, // Bottom-Left
-};
-
-float topface[] = {
-    // --- Top Face (Y = +0.5) ---            // UV Coordinates
-    -0.5f, 0.5f, 0.5f,  0.0f, 1.0f, 0.0f, 0.0f, 0.0f, // Bottom-Left
-    0.5f,  0.5f, 0.5f,  0.0f, 1.0f, 0.0f, 1.0f, 0.0f, // Bottom-Right
-    0.5f,  0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f, // Top-Right
-    0.5f,  0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f, // Top-Right
-    -0.5f, 0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, // Top-Left
-    -0.5f, 0.5f, 0.5f,  0.0f, 1.0f, 0.0f, 0.0f, 0.0f, // Bottom-Left
-};
-
-float bottomface[] = {
-    // --- Bottom Face (Y = -0.5) ---         // UV Coordinates
-    -0.5f, -0.5f, -0.5f, 0.0f, -1.0f, 0.0f, 0.0f, 0.0f, // Bottom-Left
-    0.5f,  -0.5f, -0.5f, 0.0f, -1.0f, 0.0f, 1.0f, 0.0f, // Bottom-Right
-    0.5f,  -0.5f, 0.5f,  0.0f, -1.0f, 0.0f, 1.0f, 1.0f, // Top-Right
-    0.5f,  -0.5f, 0.5f,  0.0f, -1.0f, 0.0f, 1.0f, 1.0f, // Top-Right
-    -0.5f, -0.5f, 0.5f,  0.0f, -1.0f, 0.0f, 0.0f, 1.0f, // Top-Left
-    -0.5f, -0.5f, -0.5f, 0.0f, -1.0f, 0.0f, 0.0f, 0.0f  // Bottom-Left
-};
-
-void add_faces(float* mesh_buffer, int& v_count, Chunk &chunk, uint8_t *data);
-
-std::vector<float> generatefaces(uint8_t *data, Chunk &chunk,
-                                 int threadchunks) {
-    float* raw_buff = new float[1000000];
+std::vector<Vertex> generatefaces(uint8_t *data, Chunk &chunk,
+                                  int threadchunks) {
+    Vertex *raw_buff = new Vertex[100000];
     int vert_c = 0;
-    add_faces(raw_buff,vert_c, chunk, data);
-    std::vector<float> mesh;
+    add_faces(raw_buff, vert_c, chunk, data);
+    std::vector<Vertex> mesh;
     mesh.reserve(vert_c);
-    mesh.assign(raw_buff,raw_buff + vert_c);
+    mesh.assign(raw_buff, raw_buff + vert_c);
 
     delete[] raw_buff;
     freedata(data);
@@ -162,8 +96,8 @@ void generateheightmap(Chunk &chunk) {
         for (int j = 0; j < 18; j++) {
             float noise =
                 perlin2D(i * 0.025 + chunk.x * 0.4, j * 0.025 + chunk.z * 0.4) *
-                83;
-            chunk.heightmap[i + j * 18] = (int)noise + 40;
+                33;
+            chunk.heightmap[i + j * 18] = (int)noise + yl / 4;
             // std::cout << (int)noise + 40 << std::endl;
         }
     }
@@ -175,6 +109,7 @@ uint8_t *generateWorld(Chunk &chunk, int threadchunks) {
     int h = yl * 16;
     for (int i = 0; i < 16; i++) {
         for (int k = 0; k < 16; k++) {
+            // for(int j = 0;j < 4;j++) blockdata[i * h + j * 16 + k] = 2;
             int height = chunk.heightmap[(i + 1) + (k + 1) * 18];
             height = (height > yl) ? yl : height;
             for (int j = 0; j < height; j++) {
@@ -187,101 +122,76 @@ uint8_t *generateWorld(Chunk &chunk, int threadchunks) {
 
 void freedata(uint8_t *mat) { free(mat); }
 
-void add_faces(float* mesh_buffer, int& v_count, Chunk &chunk, uint8_t *data) {
+void add_faces(Vertex *mesh_buffer, int &v_count, Chunk &chunk, uint8_t *data) {
     int h = yl * 16;
     for (int i = 0; i < 16; i++) {
         for (int j = 0; j < yl; j++) {
             for (int k = 0; k < 16; k++) {
                 int inde = i * h + j * 16 + k;
-                if (data[inde] <= 0) continue;
+                if (data[inde] <= 0)
+                    continue;
 
                 int hIdx = (i + 1) + (k + 1) * 18;
-                float xoff = i + chunk.x * 16, yoff = j - yl / 2.f, zoff = k + chunk.z * 16;
 
                 if (i == 15 && j < chunk.heightmap[hIdx + 1]) {
                 } else if (i == 15 || data[inde + h] == 0) {
-                    for (int v = 0; v < 48; v += 8) {
-                        mesh_buffer[v_count++] = rightface[v] + xoff;
-                        mesh_buffer[v_count++] = rightface[v + 1] + yoff;
-                        mesh_buffer[v_count++] = rightface[v + 2] + zoff;
-                        mesh_buffer[v_count++] = rightface[v + 3];
-                        mesh_buffer[v_count++] = rightface[v + 4];
-                        mesh_buffer[v_count++] = rightface[v + 5];
-                        mesh_buffer[v_count++] = rightface[v + 6];
-                        mesh_buffer[v_count++] = rightface[v + 7];
-                    }
+                    uint32_t packedFace = 0;
+                    packedFace |= (i & 0x1F);
+                    packedFace |= ((j & 0xFF) << 5);
+                    packedFace |= ((k & 0x1F) << 13);
+                    packedFace |= ((0 & 0x7) << 18);
+                    mesh_buffer[v_count++].data = packedFace;
                 }
 
                 if (i == 0 && j < chunk.heightmap[hIdx - 1]) {
                 } else if (i == 0 || data[inde - h] == 0) {
-                    for (int v = 0; v < 48; v += 8) {
-                        mesh_buffer[v_count++] = leftface[v] + xoff;
-                        mesh_buffer[v_count++] = leftface[v + 1] + yoff;
-                        mesh_buffer[v_count++] = leftface[v + 2] + zoff;
-                        mesh_buffer[v_count++] = leftface[v + 3];
-                        mesh_buffer[v_count++] = leftface[v + 4];
-                        mesh_buffer[v_count++] = leftface[v + 5];
-                        mesh_buffer[v_count++] = leftface[v + 6];
-                        mesh_buffer[v_count++] = leftface[v + 7];
-                    }
+                    uint32_t packedFace = 0;
+                    packedFace |= (i & 0x1F);
+                    packedFace |= ((j & 0xFF) << 5);
+                    packedFace |= ((k & 0x1F) << 13);
+                    packedFace |= ((1 & 0x7) << 18);
+                    mesh_buffer[v_count++].data = packedFace;
                 }
 
                 // TOP FACE
                 if (j == yl - 1 || data[inde + 16] == 0) {
-                    for (int v = 0; v < 48; v += 8) {
-                        mesh_buffer[v_count++] = topface[v] + xoff;
-                        mesh_buffer[v_count++] = topface[v + 1] + yoff;
-                        mesh_buffer[v_count++] = topface[v + 2] + zoff;
-                        mesh_buffer[v_count++] = topface[v + 3];
-                        mesh_buffer[v_count++] = topface[v + 4];
-                        mesh_buffer[v_count++] = topface[v + 5];
-                        mesh_buffer[v_count++] = topface[v + 6];
-                        mesh_buffer[v_count++] = topface[v + 7];
-                    }
+                    uint32_t packedFace = 0;
+                    packedFace |= (i & 0x1F);
+                    packedFace |= ((j & 0xFF) << 5);
+                    packedFace |= ((k & 0x1F) << 13);
+                    packedFace |= ((2 & 0x7) << 18);
+                    mesh_buffer[v_count++].data = packedFace;
                 }
 
                 // FRONT FACE
                 if (k == 15 && j < chunk.heightmap[hIdx + 18]) {
                 } else if (k == 15 || data[inde + 1] == 0) {
-                    for (int v = 0; v < 48; v += 8) {
-                        mesh_buffer[v_count++] = frontface[v] + xoff;
-                        mesh_buffer[v_count++] = frontface[v + 1] + yoff;
-                        mesh_buffer[v_count++] = frontface[v + 2] + zoff;
-                        mesh_buffer[v_count++] = frontface[v + 3];
-                        mesh_buffer[v_count++] = frontface[v + 4];
-                        mesh_buffer[v_count++] = frontface[v + 5];
-                        mesh_buffer[v_count++] = frontface[v + 6];
-                        mesh_buffer[v_count++] = frontface[v + 7];
-                    }
+                    uint32_t packedFace = 0;
+                    packedFace |= (i & 0x1F);
+                    packedFace |= ((j & 0xFF) << 5);
+                    packedFace |= ((k & 0x1F) << 13);
+                    packedFace |= ((4 & 0x7) << 18);
+                    mesh_buffer[v_count++].data = packedFace;
                 }
-
                 // BACK FACE
                 if (k == 0 && j < chunk.heightmap[hIdx - 18]) {
                 } else if (k == 0 || data[inde - 1] == 0) {
-                    for (int v = 0; v < 48; v += 8) {
-                        mesh_buffer[v_count++] = backface[v] + xoff;
-                        mesh_buffer[v_count++] = backface[v + 1] + yoff;
-                        mesh_buffer[v_count++] = backface[v + 2] + zoff;
-                        mesh_buffer[v_count++] = backface[v + 3];
-                        mesh_buffer[v_count++] = backface[v + 4];
-                        mesh_buffer[v_count++] = backface[v + 5];
-                        mesh_buffer[v_count++] = backface[v + 6];
-                        mesh_buffer[v_count++] = backface[v + 7];
-                    }
+                    uint32_t packedFace = 0;
+                    packedFace |= (i & 0x1F);
+                    packedFace |= ((j & 0xFF) << 5);
+                    packedFace |= ((k & 0x1F) << 13);
+                    packedFace |= ((5 & 0x7) << 18);
+                    mesh_buffer[v_count++].data = packedFace;
                 }
 
                 // BOTTOM FACE
                 if (j != 0 && data[inde - 16] == 0) {
-                    for (int v = 0; v < 48; v += 8) {
-                        mesh_buffer[v_count++] = bottomface[v] + xoff;
-                        mesh_buffer[v_count++] = bottomface[v + 1] + yoff;
-                        mesh_buffer[v_count++] = bottomface[v + 2] + zoff;
-                        mesh_buffer[v_count++] = bottomface[v + 3];
-                        mesh_buffer[v_count++] = bottomface[v + 4];
-                        mesh_buffer[v_count++] = bottomface[v + 5];
-                        mesh_buffer[v_count++] = bottomface[v + 6];
-                        mesh_buffer[v_count++] = bottomface[v + 7];
-                    }
+                    uint32_t packedFace = 0;
+                    packedFace |= (i & 0x1F);
+                    packedFace |= ((j & 0xFF) << 5);
+                    packedFace |= ((k & 0x1F) << 13);
+                    packedFace |= ((3 & 0x7) << 18);
+                    mesh_buffer[v_count++].data = packedFace;
                 }
             }
         }
