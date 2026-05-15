@@ -9,12 +9,20 @@
 #include <iostream>
 #define STB_IMAGE_IMPLEMENTATION
 #include "Misc/terrain.hpp"
+#include <future>
 #include <stb/stb_image.h>
 #include <vector>
 
 int width = 1066, height = 600;
-int render_dis = 8;
-
+const int render_dis = 16;
+float playerx = 0, playerz = 0, playerxprev = 0, playerzprev = 0;
+const int render_index = render_dis * render_dis * 4;
+std::vector<float> meshdata[render_index];
+int thread_chunks = render_dis / 2;
+int render_valll = render_dis * 2;
+unsigned int VAO[render_index] = {0}, VBO[render_index] = {0};
+int initial_cx = (int)std::floor(playerx / 16.0f);
+int initial_cz = (int)std::floor(playerz / 16.0f);
 
 Camera camera(45.0f, (float)width / height, 0.1f, 1000.0f,
               glm::vec3(0.0f, 0.0f, -1.0f), glm::vec3(0.0f, 1.0f, 3.0f));
@@ -23,8 +31,19 @@ void framebuffer_cb(GLFWwindow *window, int width, int height);
 void mouse_cb(GLFWwindow *window, double x, double y);
 void scroll_cb(GLFWwindow *window, double x, double y);
 void process_inp(GLFWwindow *window, double delta);
-
-std::vector<float> meshdata, meshdata2;
+inline int wrap(int a, int b);
+void generate_world(int thr_ch, int render_val, int x, int z,
+                    unsigned int VAO[render_index],
+                    unsigned int VBO[render_index]);
+void chunkchange(float x, float z, float &xprev, float &zprev,
+                 int thread_chunks, int render_val,
+                 unsigned int VAO[render_index],
+                 unsigned int VBO[render_index]);
+struct ChunkCord {
+    int x, z;
+};
+struct ChunkCord chunks_index[render_index];
+bool chunk_loaded[render_index] = {false};
 
 int main() {
     glfwInit();
@@ -51,38 +70,14 @@ int main() {
     glfwSetCursorPosCallback(window, mouse_cb);
     glfwSetScrollCallback(window, scroll_cb);
     glEnable(GL_DEPTH_TEST);
-    double st = 0,en = 0;
-    st= glfwGetTime();
-    int thread_chunks = render_dis / 2;
-    for (int i = -render_dis; i < render_dis; i++) {
-        for (int j = -render_dis; j < render_dis; j++) {
-            Chunk chunk(i, j);
-            int *** blockdata = generateWorld(chunk,thread_chunks);
-            meshdata2 = generatefaces(blockdata, chunk,thread_chunks);
-            meshdata.reserve(meshdata.size() + meshdata2.size());
-            meshdata.insert(meshdata.end(), meshdata2.begin(), meshdata2.end());
-        }
-    }
-    en = glfwGetTime();
-    std::cout << en - st << std::endl;
-    unsigned int VAO, VBO;
-    glGenVertexArrays(1, &VAO);
-    glBindVertexArray(VAO);
-    glGenBuffers(1, &VBO);
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, meshdata.size() * sizeof(float),
-                 meshdata.data(), GL_STATIC_DRAW);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 8,
-                          (void *)0);
-    glEnableVertexAttribArray(0);
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float),
-                          (void *)(3 * sizeof(float)));
-    glEnableVertexAttribArray(1);
-    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float),
-                          (void *)(6 * sizeof(float)));
-    glEnableVertexAttribArray(2);
-    // glBindVertexArray(0);
+    double st = 0, en = 0;
+    st = glfwGetTime();
 
+    generate_world(thread_chunks, render_valll, initial_cx, initial_cz, VAO,
+                   VBO);
+
+    en = glfwGetTime();
+    std::cout << "World Gen Time: " << (en - st) * 1000 << "ms" << std::endl;
     Shader shader1("shader/vertex.glsl", "shader/fragment.glsl");
 
     glEnable(GL_CULL_FACE);
@@ -151,20 +146,34 @@ int main() {
         double delta = time - pasttime;
         pasttime = time;
         process_inp(window, delta);
+
         glClearColor(0.3f, 0.5f, 0.7f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+        chunkchange(playerx, playerz, playerxprev, playerzprev, thread_chunks,
+                    render_valll, VAO, VBO);
 
         camera.updatevec();
         camera.updatemat(projectionmat, viewmat);
         glUniform3f(campos, camera.pos.x, camera.pos.y, camera.pos.z);
-        glDrawArrays(GL_TRIANGLES, 0, meshdata.size() / 8);
-
+        for (int i = 0; i < render_index; i++) {
+            if (!chunk_loaded[i] || meshdata[i].empty())
+                continue;
+            if (!(camera.checkfrustum(
+                    chunks_index[i].x,
+                    chunks_index[i].z)))
+                continue;
+            glBindVertexArray(VAO[i]);
+            glDrawArrays(GL_TRIANGLES, 0, meshdata[i].size() / 8);
+        }
         glfwSwapBuffers(window);
         glfwPollEvents();
     }
 
-    glDeleteVertexArrays(1, &VAO);
-    glDeleteBuffers(1, &VBO);
+    for (int i = 0; i < render_index; i++) {
+        glDeleteVertexArrays(1, &VAO[i]);
+        glDeleteBuffers(1, &VBO[i]);
+    }
     glfwTerminate();
     return 0;
 }
@@ -202,6 +211,10 @@ void process_inp(GLFWwindow *window, double delta) {
     if (glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS) {
         camera.isDirty = true;
         camera.pos -= glm::vec3(0.0f, camspd, 0.0f);
+    }
+    if (camera.isDirty) {
+        playerx = camera.pos.x;
+        playerz = camera.pos.z;
     }
 }
 void mouse_cb(GLFWwindow *window, double x, double y) {
@@ -241,3 +254,81 @@ void scroll_cb(GLFWwindow *window, double x, double y) {
     if (camera.FOV < 1.0f)
         camera.FOV = 1.0f;
 }
+
+void generate_world(int thread_chunks, int render_valll, int x, int z,
+                    unsigned int VAO[render_index],
+                    unsigned int VBO[render_index]) {
+    std::vector<std::future<void>> futures;
+    std::vector<int> pushback;
+    pushback.reserve(render_valll);
+    for (int i = (-render_dis + x); i < (render_dis + x); i++) {
+        for (int j = (-render_dis + z); j < (render_dis + z); j++) {
+
+            int xi = wrap(i, render_valll);
+            int yj = wrap(j, render_valll);
+            int index = xi * render_valll + yj;
+            if (!chunk_loaded[index] || chunks_index[index].x != i ||
+                chunks_index[index].z != j) {
+
+                chunk_loaded[index] = true;
+                chunks_index[index] = {i, j};
+                pushback.push_back(index);
+                futures.push_back(std::async(
+                    std::launch::async, [i, j, thread_chunks, index]() {
+                        Chunk chunk(i, j);
+                        uint8_t *blockdata =
+                            generateWorld(chunk, thread_chunks);
+
+                        meshdata[index] =
+                            generatefaces(blockdata, chunk, thread_chunks);
+                    }));
+            }
+        }
+    }
+    for (auto &f : futures) {
+        f.get();
+    }
+
+    for (int i : pushback) {
+        if (VAO[i] != 0)
+            glDeleteVertexArrays(1, &VAO[i]);
+        if (VBO[i] != 0)
+            glDeleteBuffers(1, &VBO[i]);
+        VBO[i] = 0;
+        VAO[i] = 0;
+        if (meshdata[i].empty())
+            continue;
+        glGenVertexArrays(1, &VAO[i]);
+        glBindVertexArray(VAO[i]);
+        glGenBuffers(1, &VBO[i]);
+        glBindBuffer(GL_ARRAY_BUFFER, VBO[i]);
+        glBufferData(GL_ARRAY_BUFFER, meshdata[i].size() * sizeof(float),
+                     meshdata[i].data(), GL_STATIC_DRAW);
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 8,
+                              (void *)0);
+        glEnableVertexAttribArray(0);
+        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float),
+                              (void *)(3 * sizeof(float)));
+        glEnableVertexAttribArray(1);
+        glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float),
+                              (void *)(6 * sizeof(float)));
+        glEnableVertexAttribArray(2);
+        glBindVertexArray(0);
+    }
+}
+void chunkchange(float x, float z, float &xprev, float &zprev,
+                 int thread_chunks, int render_val,
+                 unsigned int VAO[render_index],
+                 unsigned int VBO[render_index]) {
+    int current_cx = (int)std::floor(x / 16.0f);
+    int current_cz = (int)std::floor(z / 16.0f);
+    int prev_cx = (int)std::floor(xprev / 16.0f);
+    int prev_cz = (int)std::floor(zprev / 16.0f);
+    if (current_cx != prev_cx || current_cz != prev_cz) {
+        generate_world(thread_chunks, render_val, current_cx, current_cz, VAO,
+                       VBO);
+    }
+    xprev = x;
+    zprev = z;
+}
+inline int wrap(int a, int b) { return ((a % b) + b) % b; }
