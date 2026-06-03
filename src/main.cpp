@@ -52,7 +52,7 @@ int main() {
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
     GLFWwindow *window =
-        glfwCreateWindow(width, height, "Ray Tracer", NULL, NULL);
+        glfwCreateWindow(width, height, "ray_tracer", NULL, NULL);
     if (window == NULL) {
         std::cerr << "WINDOW CREATION FAILED" << std::endl;
         glfwTerminate();
@@ -85,14 +85,14 @@ int main() {
     glFrontFace(GL_CCW);
 
     stbi_set_flip_vertically_on_load(1);
-    int tw1, th1, tch1, tw2, th2, tch2;
+    int tw1, th1, tch1, tw2, th2, tch2, tw3, th3, tch3;
     unsigned char *sidepro = stbi_load(
         "/home/leonuraht/Downloads/grass_side(1).jpg", &tw1, &th1, &tch1, 3);
-    unsigned int texture1, texture2;
+    unsigned int texture1, texture2, texture3;
     glGenTextures(1, &texture1);
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, texture1);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, tw1, th1, 0, GL_RGB,
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_SRGB, tw1, th1, 0, GL_RGB,
                  GL_UNSIGNED_BYTE, sidepro);
     glGenerateMipmap(GL_TEXTURE_2D);
 
@@ -109,7 +109,7 @@ int main() {
     glGenTextures(1, &texture2);
     glActiveTexture(GL_TEXTURE1);
     glBindTexture(GL_TEXTURE_2D, texture2);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, tw2, th2, 0, GL_RGB,
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_SRGB, tw2, th2, 0, GL_RGB,
                  GL_UNSIGNED_BYTE, toppro);
     glGenerateMipmap(GL_TEXTURE_2D);
 
@@ -121,6 +121,23 @@ int main() {
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
     stbi_image_free(toppro);
+    unsigned char *topnorm = stbi_load(
+        "/home/leonuraht/Downloads/grass_top_n.png", &tw3, &th3, &tch3, 3);
+    glGenTextures(1, &texture3);
+    glActiveTexture(GL_TEXTURE2);
+    glBindTexture(GL_TEXTURE_2D, texture3);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, tw3, th3, 0, GL_RGB,
+                 GL_UNSIGNED_BYTE, topnorm);
+    glGenerateMipmap(GL_TEXTURE_2D);
+
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
+                    GL_LINEAR_MIPMAP_LINEAR);
+
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    stbi_image_free(topnorm);
 
     glUseProgram(shader1.program);
     int projectionmat = glGetUniformLocation(shader1.program, "projection"),
@@ -130,7 +147,8 @@ int main() {
         campos = glGetUniformLocation(shader1.program, "campos"),
         texture00 = glGetUniformLocation(shader1.program, "texture0"),
         texture01 = glGetUniformLocation(shader1.program, "texture1"),
-        chunk_cord = glGetUniformLocation(shader1.program, "chunk_cord");
+        chunk_cord = glGetUniformLocation(shader1.program, "chunk_cord"),
+        texture02 = glGetUniformLocation(shader1.program, "texture2");
 
     glm::mat4 model = glm::mat4(1.0f);
     glUniformMatrix4fv(modelmat, 1, GL_FALSE, glm::value_ptr(model));
@@ -140,6 +158,7 @@ int main() {
     glUniform3f(lightdir, lightd.x, lightd.y, lightd.z);
     glUniform1i(texture00, 0);
     glUniform1i(texture01, 1);
+    glUniform1i(texture02, 2);
 
     double pasttime = glfwGetTime();
     while (!glfwWindowShouldClose(window)) {

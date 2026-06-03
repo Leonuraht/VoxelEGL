@@ -4,6 +4,7 @@ layout(location = 0) in uint data;
 out vec3 normal;
 out vec3 fragpos;
 out vec2 Texcord;
+out float outAO;
 uniform mat4 projection;
 uniform mat4 view;
 uniform mat4 model;
@@ -40,9 +41,18 @@ const vec2 faceUVs[6] = vec2[6](
 void main() {
     float posx = chunk_cord.x + (data & 0x1Fu);
     float posy = ((data >> 5u) & 0xFFu) - 86.f;
-    float posz = chunk_cord.y  + ((data >> 13u) & 0x1Fu);
+    float posz = chunk_cord.y + ((data >> 13u) & 0x1Fu);
     uint face_num = (data >> 18u) & 0x7u;
-    vec3 position = vec3(posx,posy,posz) + faceVertices[face_num][gl_VertexID];
+    uint ao0 = (data >> 21u) & 0x3u;
+    uint ao1 = (data >> 23u) & 0x3u;
+    uint ao2 = (data >> 25u) & 0x3u;
+    uint ao3 = (data >> 27u) & 0x3u;
+
+    uint aoValues[6] = uint[6](ao1, ao2, ao3, ao3, ao0, ao1);
+    uint vertexAO = aoValues[gl_VertexID];
+    float aoFactor = 0.4 + (float(vertexAO) / 3.0) * 0.6;
+    outAO = aoFactor;
+    vec3 position = vec3(posx, posy, posz) + faceVertices[face_num][gl_VertexID];
     vec4 mpos = model * vec4(position, 1.0f);
     gl_Position = projection * view * mpos;
     normal = faceNormals[face_num];

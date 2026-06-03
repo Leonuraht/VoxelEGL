@@ -19,6 +19,5 @@ typedef struct {
 uint8_t *generateWorld(Chunk &chunk, int threadch);
 std::vector<Vertex> generatefaces(uint8_t *worlddata, Chunk &chunk,
                                  int threadch);
-void freedata(uint8_t *mat);
 
 #endif

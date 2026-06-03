@@ -1,7 +1,7 @@
 #include "Misc/terrain.hpp"
 #include <GLFW/glfw3.h>
 #include <cstdint>
-#include <cstdlib>
+#include <cstring>
 // #include <iostream>
 int yl = 256;
 
@@ -12,17 +12,21 @@ Chunk::Chunk(int x, int z) {
 
 void add_faces(Vertex *mesh_buffer, int &v_count, Chunk &chunk, uint8_t *data);
 
+int calculateAO(bool side1, bool side2, bool corner) {
+    if (side1 && side2)
+        return 0;
+    return 3 - (int(side1) + int(side2) + int(corner));
+}
+
 std::vector<Vertex> generatefaces(uint8_t *data, Chunk &chunk,
                                   int threadchunks) {
-    Vertex *raw_buff = new Vertex[100000];
+    thread_local Vertex raw_buff[100000];
     int vert_c = 0;
     add_faces(raw_buff, vert_c, chunk, data);
     std::vector<Vertex> mesh;
     mesh.reserve(vert_c);
     mesh.assign(raw_buff, raw_buff + vert_c);
 
-    delete[] raw_buff;
-    freedata(data);
     return mesh;
 }
 
@@ -98,99 +102,214 @@ void generateheightmap(Chunk &chunk) {
                 perlin2D(i * 0.025 + chunk.x * 0.4, j * 0.025 + chunk.z * 0.4) *
                 33;
             chunk.heightmap[i + j * 18] = (int)noise + yl / 4;
-            // std::cout << (int)noise + 40 << std::endl;
         }
     }
 }
 
 uint8_t *generateWorld(Chunk &chunk, int threadchunks) {
-    uint8_t *blockdata = (uint8_t *)calloc(16 * 16 * yl, sizeof(uint8_t));
+    thread_local uint8_t blockdata[18 * 18 * 256];
+    memset(blockdata, 0, sizeof(blockdata));
     generateheightmap(chunk);
-    int h = yl * 16;
-    for (int i = 0; i < 16; i++) {
-        for (int k = 0; k < 16; k++) {
-            // for(int j = 0;j < 4;j++) blockdata[i * h + j * 16 + k] = 2;
-            int height = chunk.heightmap[(i + 1) + (k + 1) * 18];
+    int h = yl * 18;
+    for (int i = 0; i < 18; i++) {
+        for (int k = 0; k < 18; k++) {
+            for (int j = 0; j < 10; j++)
+                blockdata[i * h + j * 18 + k] = 2;
+            int height = chunk.heightmap[i + k * 18];
             height = (height > yl) ? yl : height;
             for (int j = 0; j < height; j++) {
-                blockdata[i * h + j * 16 + k] = 1;
+                blockdata[i * h + j * 18 + k] = 1;
             }
         }
     }
     return blockdata;
 }
-
-void freedata(uint8_t *mat) { free(mat); }
-
 void add_faces(Vertex *mesh_buffer, int &v_count, Chunk &chunk, uint8_t *data) {
-    int h = yl * 16;
-    for (int i = 0; i < 16; i++) {
+    int h = yl * 18;
+    for (int i = 1; i < 17; i++) {
         for (int j = 0; j < yl; j++) {
-            for (int k = 0; k < 16; k++) {
-                int inde = i * h + j * 16 + k;
+            for (int k = 1; k < 17; k++) {
+                int inde = i * h + j * 18 + k;
                 if (data[inde] <= 0)
                     continue;
 
-                int hIdx = (i + 1) + (k + 1) * 18;
+                // ============================================================
+                // 0: RIGHT FACE (+X) - Anchor point is data[inde + h]
+                // ============================================================
+                if (data[inde + h] == 0) {
+                    int side = inde + h;
 
-                if (i == 15 && j < chunk.heightmap[hIdx + 1]) {
-                } else if (i == 15 || data[inde + h] == 0) {
+                    bool b_down  = (j > 0 && data[side - 18] > 0);
+                    bool b_up    = (j < yl - 1 && data[side + 18] > 0);
+                    bool b_back  = (data[side - 1] > 0);
+                    bool b_front = (data[side + 1] > 0);
+
+                    bool b_down_back  = (j > 0 && data[side - 18 - 1] > 0);
+                    bool b_down_front = (j > 0 && data[side - 18 + 1] > 0);
+                    bool b_up_back    = (j < yl - 1 && data[side + 18 - 1] > 0);
+                    bool b_up_front   = (j < yl - 1 && data[side + 18 + 1] > 0);
+
+                    uint32_t ao0 = calculateAO(b_down, b_front, b_down_front);
+                    uint32_t ao1 = calculateAO(b_down, b_back,  b_down_back);
+                    uint32_t ao2 = calculateAO(b_up,   b_back,  b_up_back);
+                    uint32_t ao3 = calculateAO(b_up,   b_front, b_up_front);
+
                     uint32_t packedFace = 0;
-                    packedFace |= (i & 0x1F);
+                    packedFace |= ((i - 1) & 0x1F);
                     packedFace |= ((j & 0xFF) << 5);
-                    packedFace |= ((k & 0x1F) << 13);
-                    packedFace |= ((0 & 0x7) << 18);
+                    packedFace |= (((k - 1) & 0x1F) << 13);
+                    packedFace |= ((0 & 0x7) << 18); // Face 0
+                    packedFace |= (ao0 << 21) | (ao1 << 23) | (ao2 << 25) | (ao3 << 27);
                     mesh_buffer[v_count++].data = packedFace;
                 }
 
-                if (i == 0 && j < chunk.heightmap[hIdx - 1]) {
-                } else if (i == 0 || data[inde - h] == 0) {
+                // ============================================================
+                // 1: LEFT FACE (-X) - Anchor point is data[inde - h]
+                // ============================================================
+                if (data[inde - h] == 0) {
+                    int side = inde - h;
+
+                    bool b_down  = (j > 0 && data[side - 18] > 0);
+                    bool b_up    = (j < yl - 1 && data[side + 18] > 0);
+                    bool b_back  = (data[side - 1] > 0);
+                    bool b_front = (data[side + 1] > 0);
+
+                    bool b_down_back  = (j > 0 && data[side - 18 - 1] > 0);
+                    bool b_down_front = (j > 0 && data[side - 18 + 1] > 0);
+                    bool b_up_back    = (j < yl - 1 && data[side + 18 - 1] > 0);
+                    bool b_up_front   = (j < yl - 1 && data[side + 18 + 1] > 0);
+
+                    uint32_t ao0 = calculateAO(b_down, b_back,  b_down_back);
+                    uint32_t ao1 = calculateAO(b_down, b_front, b_down_front);
+                    uint32_t ao2 = calculateAO(b_up,   b_front, b_up_front);
+                    uint32_t ao3 = calculateAO(b_up,   b_back,  b_up_back);
+
                     uint32_t packedFace = 0;
-                    packedFace |= (i & 0x1F);
+                    packedFace |= ((i - 1) & 0x1F);
                     packedFace |= ((j & 0xFF) << 5);
-                    packedFace |= ((k & 0x1F) << 13);
-                    packedFace |= ((1 & 0x7) << 18);
+                    packedFace |= (((k - 1) & 0x1F) << 13);
+                    packedFace |= ((1 & 0x7) << 18); // Face 1
+                    packedFace |= (ao0 << 21) | (ao1 << 23) | (ao2 << 25) | (ao3 << 27);
                     mesh_buffer[v_count++].data = packedFace;
                 }
 
-                // TOP FACE
-                if (j == yl - 1 || data[inde + 16] == 0) {
+                // ============================================================
+                // 2: TOP FACE (+Y) - Anchor point is data[inde + 18]
+                // ============================================================
+                if (j == yl - 1 || data[inde + 18] == 0) {
+                    int top = inde + 18;
+
+                    bool b_left  = (data[top - h] > 0);
+                    bool b_right = (data[top + h] > 0);
+                    bool b_back  = (data[top - 1] > 0);
+                    bool b_front = (data[top + 1] > 0);
+
+                    bool b_back_left   = (data[top - h - 1] > 0);
+                    bool b_back_right  = (data[top + h - 1] > 0);
+                    bool b_front_left  = (data[top - h + 1] > 0);
+                    bool b_front_right = (data[top + h + 1] > 0);
+
+                    uint32_t ao0 = calculateAO(b_left,  b_back,  b_back_left);
+                    uint32_t ao1 = calculateAO(b_left,  b_front, b_front_left);
+                    uint32_t ao2 = calculateAO(b_right, b_front, b_front_right);
+                    uint32_t ao3 = calculateAO(b_right, b_back,  b_back_right);
+
                     uint32_t packedFace = 0;
-                    packedFace |= (i & 0x1F);
+                    packedFace |= ((i - 1) & 0x1F);
                     packedFace |= ((j & 0xFF) << 5);
-                    packedFace |= ((k & 0x1F) << 13);
-                    packedFace |= ((2 & 0x7) << 18);
+                    packedFace |= (((k - 1) & 0x1F) << 13);
+                    packedFace |= ((2 & 0x7) << 18); // Face 2
+                    packedFace |= (ao0 << 21) | (ao1 << 23) | (ao2 << 25) | (ao3 << 27);
                     mesh_buffer[v_count++].data = packedFace;
                 }
 
-                // FRONT FACE
-                if (k == 15 && j < chunk.heightmap[hIdx + 18]) {
-                } else if (k == 15 || data[inde + 1] == 0) {
+                // ============================================================
+                // 3: BOTTOM FACE (-Y) - Anchor point is data[inde - 18]
+                // ============================================================
+                if (j != 0 && data[inde - 18] == 0) {
+                    int bot = inde - 18;
+
+                    bool b_left  = (data[bot - h] > 0);
+                    bool b_right = (data[bot + h] > 0);
+                    bool b_back  = (data[bot - 1] > 0);
+                    bool b_front = (data[bot + 1] > 0);
+
+                    bool b_back_left   = (data[bot - h - 1] > 0);
+                    bool b_back_right  = (data[bot + h - 1] > 0);
+                    bool b_front_left  = (data[bot - h + 1] > 0);
+                    bool b_front_right = (data[bot + h + 1] > 0);
+
+                    uint32_t ao0 = calculateAO(b_left,  b_back,  b_back_left);
+                    uint32_t ao1 = calculateAO(b_left,  b_front, b_front_left);
+                    uint32_t ao2 = calculateAO(b_right, b_front, b_front_right);
+                    uint32_t ao3 = calculateAO(b_right, b_back,  b_back_right);
+
                     uint32_t packedFace = 0;
-                    packedFace |= (i & 0x1F);
+                    packedFace |= ((i - 1) & 0x1F);
                     packedFace |= ((j & 0xFF) << 5);
-                    packedFace |= ((k & 0x1F) << 13);
-                    packedFace |= ((4 & 0x7) << 18);
-                    mesh_buffer[v_count++].data = packedFace;
-                }
-                // BACK FACE
-                if (k == 0 && j < chunk.heightmap[hIdx - 18]) {
-                } else if (k == 0 || data[inde - 1] == 0) {
-                    uint32_t packedFace = 0;
-                    packedFace |= (i & 0x1F);
-                    packedFace |= ((j & 0xFF) << 5);
-                    packedFace |= ((k & 0x1F) << 13);
-                    packedFace |= ((5 & 0x7) << 18);
+                    packedFace |= (((k - 1) & 0x1F) << 13);
+                    packedFace |= ((3 & 0x7) << 18); // Face 3
+                    packedFace |= (ao0 << 21) | (ao1 << 23) | (ao2 << 25) | (ao3 << 27);
                     mesh_buffer[v_count++].data = packedFace;
                 }
 
-                // BOTTOM FACE
-                if (j != 0 && data[inde - 16] == 0) {
+                // ============================================================
+                // 4: FRONT FACE (+Z) - Anchor point is data[inde + 1]
+                // ============================================================
+                if (data[inde + 1] == 0) {
+                    int side = inde + 1;
+
+                    bool b_left  = (data[side - h] > 0);
+                    bool b_right = (data[side + h] > 0);
+                    bool b_down  = (j > 0 && data[side - 18] > 0);
+                    bool b_up    = (j < yl - 1 && data[side + 18] > 0);
+
+                    bool b_down_left  = (j > 0 && data[side - 18 - h] > 0);
+                    bool b_down_right = (j > 0 && data[side - 18 + h] > 0);
+                    bool b_up_left    = (j < yl - 1 && data[side + 18 - h] > 0);
+                    bool b_up_right   = (j < yl - 1 && data[side + 18 + h] > 0);
+
+                    uint32_t ao0 = calculateAO(b_left,  b_down, b_down_left);
+                    uint32_t ao1 = calculateAO(b_right, b_down, b_down_right);
+                    uint32_t ao2 = calculateAO(b_right, b_up,   b_up_right);
+                    uint32_t ao3 = calculateAO(b_left,  b_up,   b_up_left);
+
                     uint32_t packedFace = 0;
-                    packedFace |= (i & 0x1F);
+                    packedFace |= ((i - 1) & 0x1F);
                     packedFace |= ((j & 0xFF) << 5);
-                    packedFace |= ((k & 0x1F) << 13);
-                    packedFace |= ((3 & 0x7) << 18);
+                    packedFace |= (((k - 1) & 0x1F) << 13);
+                    packedFace |= ((4 & 0x7) << 18); // Face 4
+                    packedFace |= (ao0 << 21) | (ao1 << 23) | (ao2 << 25) | (ao3 << 27);
+                    mesh_buffer[v_count++].data = packedFace;
+                }
+
+                // ============================================================
+                // 5: BACK FACE (-Z) - Anchor point is data[inde - 1]
+                // ============================================================
+                if (data[inde - 1] == 0) {
+                    int side = inde - 1;
+
+                    bool b_left  = (data[side - h] > 0);
+                    bool b_right = (data[side + h] > 0);
+                    bool b_down  = (j > 0 && data[side - 18] > 0);
+                    bool b_up    = (j < yl - 1 && data[side + 18] > 0);
+
+                    bool b_down_left  = (j > 0 && data[side - 18 - h] > 0);
+                    bool b_down_right = (j > 0 && data[side - 18 + h] > 0);
+                    bool b_up_left    = (j < yl - 1 && data[side + 18 - h] > 0);
+                    bool b_up_right   = (j < yl - 1 && data[side + 18 + h] > 0);
+
+                    uint32_t ao0 = calculateAO(b_right, b_down, b_down_right);
+                    uint32_t ao1 = calculateAO(b_left,  b_down, b_down_left);
+                    uint32_t ao2 = calculateAO(b_left,  b_up,   b_up_left);
+                    uint32_t ao3 = calculateAO(b_right, b_up,   b_up_right);
+
+                    uint32_t packedFace = 0;
+                    packedFace |= ((i - 1) & 0x1F);
+                    packedFace |= ((j & 0xFF) << 5);
+                    packedFace |= (((k - 1) & 0x1F) << 13);
+                    packedFace |= ((5 & 0x7) << 18); // Face 5
+                    packedFace |= (ao0 << 21) | (ao1 << 23) | (ao2 << 25) | (ao3 << 27);
                     mesh_buffer[v_count++].data = packedFace;
                 }
             }

@@ -2,6 +2,10 @@
 #include <glm/ext/quaternion_geometric.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
+static glm::vec3 cross_up(glm::vec3 vector){
+    return glm::vec3(-vector.z,0,vector.x);
+}
+
 Camera::Camera(float FOV, float aspectratio, float near, float far,
                glm ::vec3 dir, glm::vec3 pos) {
     this->FOV = FOV;
