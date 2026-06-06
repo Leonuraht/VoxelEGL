@@ -95,13 +95,33 @@ float perlin2D(float x, float z) {
                 lerp(u, grad(p[A + 1], x, z - 1.0f),
                      grad(p[B + 1], x - 1.0f, z - 1.0f)));
 }
+
+float octaveNoise2D(float x, float z, int octaves, float persistence,
+                    float lacunarity) {
+    float total = 0.0f;
+    float frequency = 1.0f;
+    float amplitude = 1.0f;
+    float maxValue = 0.0f;
+    for (int i = 0; i < octaves; i++) {
+
+        float noiseValue = perlin2D(x * frequency, z * frequency);
+
+        total += noiseValue * amplitude;
+        maxValue += amplitude;
+        frequency *= lacunarity;
+        amplitude *= persistence;
+    }
+
+    return total / maxValue;
+}
+
 void generateheightmap(Chunk &chunk) {
     for (int i = 0; i < 18; i++) {
         for (int j = 0; j < 18; j++) {
             float noise =
-                perlin2D(i * 0.025 + chunk.x * 0.4, j * 0.025 + chunk.z * 0.4) *
-                33;
-            chunk.heightmap[i + j * 18] = (int)noise + yl / 4;
+                octaveNoise2D(i * 0.025 + chunk.x * 0.4,
+                              j * 0.025 + chunk.z * 0.4, 4, 0.3f, 2.f);
+            chunk.heightmap[i + j * 18] = (int)(noise * 45.f) + yl / 4;
         }
     }
 }
@@ -139,27 +159,28 @@ void add_faces(Vertex *mesh_buffer, int &v_count, Chunk &chunk, uint8_t *data) {
                 if (data[inde + h] == 0) {
                     int side = inde + h;
 
-                    bool b_down  = (j > 0 && data[side - 18] > 0);
-                    bool b_up    = (j < yl - 1 && data[side + 18] > 0);
-                    bool b_back  = (data[side - 1] > 0);
+                    bool b_down = (j > 0 && data[side - 18] > 0);
+                    bool b_up = (j < yl - 1 && data[side + 18] > 0);
+                    bool b_back = (data[side - 1] > 0);
                     bool b_front = (data[side + 1] > 0);
 
-                    bool b_down_back  = (j > 0 && data[side - 18 - 1] > 0);
+                    bool b_down_back = (j > 0 && data[side - 18 - 1] > 0);
                     bool b_down_front = (j > 0 && data[side - 18 + 1] > 0);
-                    bool b_up_back    = (j < yl - 1 && data[side + 18 - 1] > 0);
-                    bool b_up_front   = (j < yl - 1 && data[side + 18 + 1] > 0);
+                    bool b_up_back = (j < yl - 1 && data[side + 18 - 1] > 0);
+                    bool b_up_front = (j < yl - 1 && data[side + 18 + 1] > 0);
 
                     uint32_t ao0 = calculateAO(b_down, b_front, b_down_front);
-                    uint32_t ao1 = calculateAO(b_down, b_back,  b_down_back);
-                    uint32_t ao2 = calculateAO(b_up,   b_back,  b_up_back);
-                    uint32_t ao3 = calculateAO(b_up,   b_front, b_up_front);
+                    uint32_t ao1 = calculateAO(b_down, b_back, b_down_back);
+                    uint32_t ao2 = calculateAO(b_up, b_back, b_up_back);
+                    uint32_t ao3 = calculateAO(b_up, b_front, b_up_front);
 
                     uint32_t packedFace = 0;
                     packedFace |= ((i - 1) & 0x1F);
                     packedFace |= ((j & 0xFF) << 5);
                     packedFace |= (((k - 1) & 0x1F) << 13);
                     packedFace |= ((0 & 0x7) << 18); // Face 0
-                    packedFace |= (ao0 << 21) | (ao1 << 23) | (ao2 << 25) | (ao3 << 27);
+                    packedFace |=
+                        (ao0 << 21) | (ao1 << 23) | (ao2 << 25) | (ao3 << 27);
                     mesh_buffer[v_count++].data = packedFace;
                 }
 
@@ -169,27 +190,28 @@ void add_faces(Vertex *mesh_buffer, int &v_count, Chunk &chunk, uint8_t *data) {
                 if (data[inde - h] == 0) {
                     int side = inde - h;
 
-                    bool b_down  = (j > 0 && data[side - 18] > 0);
-                    bool b_up    = (j < yl - 1 && data[side + 18] > 0);
-                    bool b_back  = (data[side - 1] > 0);
+                    bool b_down = (j > 0 && data[side - 18] > 0);
+                    bool b_up = (j < yl - 1 && data[side + 18] > 0);
+                    bool b_back = (data[side - 1] > 0);
                     bool b_front = (data[side + 1] > 0);
 
-                    bool b_down_back  = (j > 0 && data[side - 18 - 1] > 0);
+                    bool b_down_back = (j > 0 && data[side - 18 - 1] > 0);
                     bool b_down_front = (j > 0 && data[side - 18 + 1] > 0);
-                    bool b_up_back    = (j < yl - 1 && data[side + 18 - 1] > 0);
-                    bool b_up_front   = (j < yl - 1 && data[side + 18 + 1] > 0);
+                    bool b_up_back = (j < yl - 1 && data[side + 18 - 1] > 0);
+                    bool b_up_front = (j < yl - 1 && data[side + 18 + 1] > 0);
 
-                    uint32_t ao0 = calculateAO(b_down, b_back,  b_down_back);
+                    uint32_t ao0 = calculateAO(b_down, b_back, b_down_back);
                     uint32_t ao1 = calculateAO(b_down, b_front, b_down_front);
-                    uint32_t ao2 = calculateAO(b_up,   b_front, b_up_front);
-                    uint32_t ao3 = calculateAO(b_up,   b_back,  b_up_back);
+                    uint32_t ao2 = calculateAO(b_up, b_front, b_up_front);
+                    uint32_t ao3 = calculateAO(b_up, b_back, b_up_back);
 
                     uint32_t packedFace = 0;
                     packedFace |= ((i - 1) & 0x1F);
                     packedFace |= ((j & 0xFF) << 5);
                     packedFace |= (((k - 1) & 0x1F) << 13);
                     packedFace |= ((1 & 0x7) << 18); // Face 1
-                    packedFace |= (ao0 << 21) | (ao1 << 23) | (ao2 << 25) | (ao3 << 27);
+                    packedFace |=
+                        (ao0 << 21) | (ao1 << 23) | (ao2 << 25) | (ao3 << 27);
                     mesh_buffer[v_count++].data = packedFace;
                 }
 
@@ -199,27 +221,28 @@ void add_faces(Vertex *mesh_buffer, int &v_count, Chunk &chunk, uint8_t *data) {
                 if (j == yl - 1 || data[inde + 18] == 0) {
                     int top = inde + 18;
 
-                    bool b_left  = (data[top - h] > 0);
+                    bool b_left = (data[top - h] > 0);
                     bool b_right = (data[top + h] > 0);
-                    bool b_back  = (data[top - 1] > 0);
+                    bool b_back = (data[top - 1] > 0);
                     bool b_front = (data[top + 1] > 0);
 
-                    bool b_back_left   = (data[top - h - 1] > 0);
-                    bool b_back_right  = (data[top + h - 1] > 0);
-                    bool b_front_left  = (data[top - h + 1] > 0);
+                    bool b_back_left = (data[top - h - 1] > 0);
+                    bool b_back_right = (data[top + h - 1] > 0);
+                    bool b_front_left = (data[top - h + 1] > 0);
                     bool b_front_right = (data[top + h + 1] > 0);
 
-                    uint32_t ao0 = calculateAO(b_left,  b_back,  b_back_left);
-                    uint32_t ao1 = calculateAO(b_left,  b_front, b_front_left);
+                    uint32_t ao0 = calculateAO(b_left, b_back, b_back_left);
+                    uint32_t ao1 = calculateAO(b_left, b_front, b_front_left);
                     uint32_t ao2 = calculateAO(b_right, b_front, b_front_right);
-                    uint32_t ao3 = calculateAO(b_right, b_back,  b_back_right);
+                    uint32_t ao3 = calculateAO(b_right, b_back, b_back_right);
 
                     uint32_t packedFace = 0;
                     packedFace |= ((i - 1) & 0x1F);
                     packedFace |= ((j & 0xFF) << 5);
                     packedFace |= (((k - 1) & 0x1F) << 13);
                     packedFace |= ((2 & 0x7) << 18); // Face 2
-                    packedFace |= (ao0 << 21) | (ao1 << 23) | (ao2 << 25) | (ao3 << 27);
+                    packedFace |=
+                        (ao1 << 21) | (ao2 << 23) | (ao3 << 25) | (ao0 << 27);
                     mesh_buffer[v_count++].data = packedFace;
                 }
 
@@ -229,27 +252,28 @@ void add_faces(Vertex *mesh_buffer, int &v_count, Chunk &chunk, uint8_t *data) {
                 if (j != 0 && data[inde - 18] == 0) {
                     int bot = inde - 18;
 
-                    bool b_left  = (data[bot - h] > 0);
+                    bool b_left = (data[bot - h] > 0);
                     bool b_right = (data[bot + h] > 0);
-                    bool b_back  = (data[bot - 1] > 0);
+                    bool b_back = (data[bot - 1] > 0);
                     bool b_front = (data[bot + 1] > 0);
 
-                    bool b_back_left   = (data[bot - h - 1] > 0);
-                    bool b_back_right  = (data[bot + h - 1] > 0);
-                    bool b_front_left  = (data[bot - h + 1] > 0);
+                    bool b_back_left = (data[bot - h - 1] > 0);
+                    bool b_back_right = (data[bot + h - 1] > 0);
+                    bool b_front_left = (data[bot - h + 1] > 0);
                     bool b_front_right = (data[bot + h + 1] > 0);
 
-                    uint32_t ao0 = calculateAO(b_left,  b_back,  b_back_left);
-                    uint32_t ao1 = calculateAO(b_left,  b_front, b_front_left);
+                    uint32_t ao0 = calculateAO(b_left, b_back, b_back_left);
+                    uint32_t ao1 = calculateAO(b_left, b_front, b_front_left);
                     uint32_t ao2 = calculateAO(b_right, b_front, b_front_right);
-                    uint32_t ao3 = calculateAO(b_right, b_back,  b_back_right);
+                    uint32_t ao3 = calculateAO(b_right, b_back, b_back_right);
 
                     uint32_t packedFace = 0;
                     packedFace |= ((i - 1) & 0x1F);
                     packedFace |= ((j & 0xFF) << 5);
                     packedFace |= (((k - 1) & 0x1F) << 13);
                     packedFace |= ((3 & 0x7) << 18); // Face 3
-                    packedFace |= (ao0 << 21) | (ao1 << 23) | (ao2 << 25) | (ao3 << 27);
+                    packedFace |=
+                        (ao0 << 21) | (ao1 << 23) | (ao2 << 25) | (ao3 << 27);
                     mesh_buffer[v_count++].data = packedFace;
                 }
 
@@ -259,27 +283,28 @@ void add_faces(Vertex *mesh_buffer, int &v_count, Chunk &chunk, uint8_t *data) {
                 if (data[inde + 1] == 0) {
                     int side = inde + 1;
 
-                    bool b_left  = (data[side - h] > 0);
+                    bool b_left = (data[side - h] > 0);
                     bool b_right = (data[side + h] > 0);
-                    bool b_down  = (j > 0 && data[side - 18] > 0);
-                    bool b_up    = (j < yl - 1 && data[side + 18] > 0);
+                    bool b_down = (j > 0 && data[side - 18] > 0);
+                    bool b_up = (j < yl - 1 && data[side + 18] > 0);
 
-                    bool b_down_left  = (j > 0 && data[side - 18 - h] > 0);
+                    bool b_down_left = (j > 0 && data[side - 18 - h] > 0);
                     bool b_down_right = (j > 0 && data[side - 18 + h] > 0);
-                    bool b_up_left    = (j < yl - 1 && data[side + 18 - h] > 0);
-                    bool b_up_right   = (j < yl - 1 && data[side + 18 + h] > 0);
+                    bool b_up_left = (j < yl - 1 && data[side + 18 - h] > 0);
+                    bool b_up_right = (j < yl - 1 && data[side + 18 + h] > 0);
 
-                    uint32_t ao0 = calculateAO(b_left,  b_down, b_down_left);
+                    uint32_t ao0 = calculateAO(b_left, b_down, b_down_left);
                     uint32_t ao1 = calculateAO(b_right, b_down, b_down_right);
-                    uint32_t ao2 = calculateAO(b_right, b_up,   b_up_right);
-                    uint32_t ao3 = calculateAO(b_left,  b_up,   b_up_left);
+                    uint32_t ao2 = calculateAO(b_right, b_up, b_up_right);
+                    uint32_t ao3 = calculateAO(b_left, b_up, b_up_left);
 
                     uint32_t packedFace = 0;
                     packedFace |= ((i - 1) & 0x1F);
                     packedFace |= ((j & 0xFF) << 5);
                     packedFace |= (((k - 1) & 0x1F) << 13);
                     packedFace |= ((4 & 0x7) << 18); // Face 4
-                    packedFace |= (ao0 << 21) | (ao1 << 23) | (ao2 << 25) | (ao3 << 27);
+                    packedFace |=
+                        (ao0 << 21) | (ao1 << 23) | (ao2 << 25) | (ao3 << 27);
                     mesh_buffer[v_count++].data = packedFace;
                 }
 
@@ -289,27 +314,28 @@ void add_faces(Vertex *mesh_buffer, int &v_count, Chunk &chunk, uint8_t *data) {
                 if (data[inde - 1] == 0) {
                     int side = inde - 1;
 
-                    bool b_left  = (data[side - h] > 0);
+                    bool b_left = (data[side - h] > 0);
                     bool b_right = (data[side + h] > 0);
-                    bool b_down  = (j > 0 && data[side - 18] > 0);
-                    bool b_up    = (j < yl - 1 && data[side + 18] > 0);
+                    bool b_down = (j > 0 && data[side - 18] > 0);
+                    bool b_up = (j < yl - 1 && data[side + 18] > 0);
 
-                    bool b_down_left  = (j > 0 && data[side - 18 - h] > 0);
+                    bool b_down_left = (j > 0 && data[side - 18 - h] > 0);
                     bool b_down_right = (j > 0 && data[side - 18 + h] > 0);
-                    bool b_up_left    = (j < yl - 1 && data[side + 18 - h] > 0);
-                    bool b_up_right   = (j < yl - 1 && data[side + 18 + h] > 0);
+                    bool b_up_left = (j < yl - 1 && data[side + 18 - h] > 0);
+                    bool b_up_right = (j < yl - 1 && data[side + 18 + h] > 0);
 
                     uint32_t ao0 = calculateAO(b_right, b_down, b_down_right);
-                    uint32_t ao1 = calculateAO(b_left,  b_down, b_down_left);
-                    uint32_t ao2 = calculateAO(b_left,  b_up,   b_up_left);
-                    uint32_t ao3 = calculateAO(b_right, b_up,   b_up_right);
+                    uint32_t ao1 = calculateAO(b_left, b_down, b_down_left);
+                    uint32_t ao2 = calculateAO(b_left, b_up, b_up_left);
+                    uint32_t ao3 = calculateAO(b_right, b_up, b_up_right);
 
                     uint32_t packedFace = 0;
                     packedFace |= ((i - 1) & 0x1F);
                     packedFace |= ((j & 0xFF) << 5);
                     packedFace |= (((k - 1) & 0x1F) << 13);
                     packedFace |= ((5 & 0x7) << 18); // Face 5
-                    packedFace |= (ao0 << 21) | (ao1 << 23) | (ao2 << 25) | (ao3 << 27);
+                    packedFace |=
+                        (ao0 << 21) | (ao1 << 23) | (ao2 << 25) | (ao3 << 27);
                     mesh_buffer[v_count++].data = packedFace;
                 }
             }

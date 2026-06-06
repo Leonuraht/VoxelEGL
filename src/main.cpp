@@ -121,22 +121,20 @@ int main() {
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
     stbi_image_free(toppro);
-    unsigned char *topnorm = stbi_load(
-        "/home/leonuraht/Downloads/grass_top_n.png", &tw3, &th3, &tch3, 3);
+    float *topnorm =
+        stbi_loadf("/home/leonuraht/Downloads/autumn_field_puresky_1k.hdr", &tw3,
+                  &th3, &tch3, 0);
     glGenTextures(1, &texture3);
     glActiveTexture(GL_TEXTURE2);
     glBindTexture(GL_TEXTURE_2D, texture3);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, tw3, th3, 0, GL_RGB,
-                 GL_UNSIGNED_BYTE, topnorm);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, tw3, th3, 0, GL_RGB,
+                 GL_FLOAT, topnorm);
     glGenerateMipmap(GL_TEXTURE_2D);
 
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
-                    GL_LINEAR_MIPMAP_LINEAR);
-
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     stbi_image_free(topnorm);
 
     glUseProgram(shader1.program);

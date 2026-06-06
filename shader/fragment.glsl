@@ -23,8 +23,8 @@ struct Grass {
 
 uniform Light light;
 
-vec3 calcDirLight(vec3 fragpos, vec3 ldir, vec3 campos, vec3 norm) {
-    vec3 ambient = vec3(0.2f);
+vec3 calcDirLight(vec3 fragpos, vec3 ldir, vec3 campos, vec3 norm,vec3 hdr) {
+    vec3 ambient = vec3(0.5f) * hdr;
     float diff = max(dot(norm, -ldir), 0.0);
     vec3 diffuse = vec3(1.f) * diff * 0.9;
     vec3 viewdir = normalize(campos - fragpos);
@@ -33,13 +33,25 @@ vec3 calcDirLight(vec3 fragpos, vec3 ldir, vec3 campos, vec3 norm) {
     vec3 specular = vec3(0.1) * spec;
     return (ambient + diffuse + specular);
 }
+const vec2 invAtan = vec2(0.1591, 0.3183); // 1/(2*PI), 1/PI
+float exposure = 1.0;
 
+vec2 SampleSphericalMap(vec3 v) {
+    vec2 uv = vec2(atan(v.z, v.x), asin(v.y));
+    uv *= invAtan;
+    uv += 0.5;
+    return uv;
+}
 void main() {
-    // vec3 norr = normalize(vec3(texture(texture2, Texcord)) * 2.f - 1.f);
+    vec3 fragc;
     vec3 norr = normalize(normal);
-    vec3 ans = calcDirLight(fragpos, light.dir, campos, norr);
+    vec2 uv = SampleSphericalMap(norr);
+    vec3 color = texture(texture2, uv).rgb;
+    vec3 ans = calcDirLight(fragpos, light.dir, campos, norr,color);
     if (normal.y > 0.5f)
-        fragcolor = vec4(pow(vec3(texture(texture1, Texcord)) * ans , vec3(1 / 2.2f)), 1.0f) * outAO ;
-    else fragcolor = vec4(pow(vec3(texture(texture0, Texcord)) * ans * outAO, vec3(1 / 2.2f)), 1.0f);
-    // fragcolor = vec4(pow(vec3(0.26f,0.81f,0.218f) * ans, vec3(1 / 2.2f)), 1.0f);
+        fragc = vec3(texture(texture1, Texcord)) * ans * outAO;
+    else fragc = vec3(texture(texture0, Texcord)) * ans * outAO;
+    vec3 mapped = vec3(1.0) - exp(-fragc * exposure);
+    mapped = pow(mapped, vec3(1.0 / 2.2));
+    fragcolor = vec4(mapped, 1.0f);
 }

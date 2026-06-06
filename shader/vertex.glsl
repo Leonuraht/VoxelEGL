@@ -47,10 +47,10 @@ void main() {
     uint ao1 = (data >> 23u) & 0x3u;
     uint ao2 = (data >> 25u) & 0x3u;
     uint ao3 = (data >> 27u) & 0x3u;
-
-    uint aoValues[6] = uint[6](ao1, ao2, ao3, ao3, ao0, ao1);
+    uint vid = gl_VertexID;
+    uint aoValues[6] = uint[6](ao0, ao1, ao2, ao2, ao3, ao0);
     uint vertexAO = aoValues[gl_VertexID];
-    float aoFactor = 0.4 + (float(vertexAO) / 3.0) * 0.6;
+    float aoFactor = 0.3 + (float(vertexAO) / 3.0) * 0.7;
     outAO = aoFactor;
     vec3 position = vec3(posx, posy, posz) + faceVertices[face_num][gl_VertexID];
     vec4 mpos = model * vec4(position, 1.0f);
